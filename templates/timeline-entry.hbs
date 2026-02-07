@@ -1,0 +1,17 @@
+<article class="timeline-entry" data-entry-id="{{id}}" draggable="true">
+  <div class="entry-drag-handle">
+    <i class="fa-solid fa-grip-vertical"></i>
+  </div>
+  <div class="entry-content">
+    <input type="text" class="entry-name" value="{{name}}" placeholder="Entry Name">
+    <textarea class="entry-description" placeholder="Description...">{{description}}</textarea>
+  </div>
+  <div class="entry-actions">
+    <button type="button" class="delete-entry-btn"
+            data-action="deleteEntry"
+            data-entry-id="{{id}}"
+            data-tooltip="Delete Entry">
+      <i class="fa-solid fa-trash"></i>
+    </button>
+  </div>
+</article>

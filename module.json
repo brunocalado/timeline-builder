@@ -1,0 +1,73 @@
+{
+  "id": "timeline-builder",
+  "title": "⏳ Timeline Builder",
+  "description": "A module for creating and managing campaign timelines!",
+
+	"media": [{
+		"type": "setup",
+		"url": "modules/timeline-builder/assets/images/thumbnail.webp",
+		"thumbnail": "modules/timeline-builder/assets/images/thumbnail.webp"
+	}],   
+
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Mestre Digital"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/timeline.css"
+  ],
+
+  "packs": [
+    {
+      "label": "Macros",
+      "type": "Macro",
+      "name": "macros",
+      "path": "packs/macros",
+      "ownership": {
+        "PLAYER": "NONE",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {},
+      "banner": "modules/timeline-builder/assets/images/banner.webp" 
+    },
+    {
+      "label": "Instructions",
+      "type": "JournalEntry",
+      "name": "journal",
+      "path": "packs/journal",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {},
+      "banner": "modules/timeline-builder/assets/images/banner.webp" 
+    }       
+  ],  
+
+  "packFolders": [
+    {
+      "name": "⏳ Timeline Builder",
+      "sorting": "a",
+      "color": "#3e0a66",
+      "packs": [        
+        "journal",
+        "macros"
+      ],
+      "folders": []
+    }
+  ],    
+
+  "url": "https://github.com/brunocalado/timeline-builder",
+  "manifest": "https://raw.githubusercontent.com/brunocalado/timeline-builder/main/module.json",
+  "download": "https://codeload.github.com/brunocalado/timeline-builder/zip/main"
+
+}

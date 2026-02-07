@@ -1,0 +1,35 @@
+<article class="timeline-entry" data-entry-id="{{id}}" draggable="true">
+  
+  <!-- Tempo -->
+  <div class="entry-col-time">
+    <div class="entry-drag-handle">
+        <i class="fa-solid fa-grip-vertical"></i>
+    </div>
+    <div class="time-wrapper">
+        <input type="text" class="entry-period" value="{{period}}" placeholder="Ano">
+        <div class="timeline-dot" style="background-color: {{#if color}}{{color}}{{else}}var(--tl-text-muted){{/if}}"></div>
+    </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="entry-col-content">
+    <input type="text" class="entry-name" value="{{name}}" placeholder="Título">
+    <textarea class="entry-description" placeholder="Descrição...">{{description}}</textarea>
+    
+    <div class="quick-actions">
+        <button type="button" class="chip-btn" data-action="pickImage" data-entry-id="{{id}}">
+            <i class="fa-solid fa-image"></i> Img
+        </button>
+        <button type="button" class="chip-btn" data-action="pickColor" data-entry-id="{{id}}">
+            <i class="fa-solid fa-palette"></i> Cor
+        </button>
+    </div>
+  </div>
+
+  <!-- Ações -->
+  <div class="entry-col-meta">
+    <button type="button" class="meta-btn danger" data-action="deleteEntry" data-entry-id="{{id}}">
+      <i class="fa-solid fa-trash"></i>
+    </button>
+  </div>
+</article>

@@ -1,0 +1,713 @@
+<div class="timeline-viewer-container" {{#if selectedTimeline.backgroundImage}}style="background-image: url('{{selectedTimeline.backgroundImage}}'); background-size: cover; background-position: center;"{{/if}}>
+  <style>
+    .timeline-viewer-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    /* Floating Filter Menu */
+    .timeline-filter-menu {
+      position: absolute;
+      top: 70px; /* Lower down */
+      left: 0;   /* Docked to left */
+      z-index: 100;
+      opacity: 0.3; /* Semi-hidden */
+      transition: opacity 0.3s;
+    }
+    .timeline-filter-menu:hover {
+      opacity: 1;
+    }
+    .filter-icon-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(30, 30, 30, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-left: none;
+      border-radius: 0 8px 8px 0; /* Square-ish */
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    }
+    .filter-icon-btn:hover {
+        background: rgba(50, 50, 50, 1);
+        color: #fff;
+    }
+    .filter-icon-btn.active {
+        color: #fff;
+        border-color: #ff9800;
+        box-shadow: 4px 0 10px rgba(255, 152, 0, 0.3);
+        border-right: 2px solid #ff9800;
+    }
+    .filter-dropdown {
+      position: absolute;
+      top: 0;
+      left: 100%; /* Opens to the right of the icon */
+      margin-left: 5px;
+      background: rgba(20, 20, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      width: 250px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      max-height: 400px;
+      overflow-y: auto;
+      align-content: flex-start;
+
+      /* Animation and Delay to prevent quick disappearance */
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-10px);
+      transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+      transition-delay: 0.3s; /* Delay to disappear */
+    }
+    .timeline-filter-menu:hover .filter-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      transition-delay: 0s; /* Appears instantly */
+    }
+    .filter-tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        transition: opacity 0.2s, filter 0.2s;
+    }
+    .filter-tag-chip.off {
+        opacity: 0.7;
+        filter: grayscale(0.3);
+    }
+    .filter-tag-chip.off:hover {
+        opacity: 0.9;
+        filter: grayscale(0.1);
+    }
+    .filter-tag-chip.on {
+        opacity: 1;
+        filter: none;
+    }
+    .filter-clear-btn {
+        width: 100%;
+        margin-top: 4px;
+        background: rgba(255, 100, 100, 0.1);
+        color: #ff8888;
+        border: 1px solid rgba(255, 100, 100, 0.3);
+        padding: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        text-align: center;
+    }
+    .filter-clear-btn:hover {
+        background: rgba(255, 100, 100, 0.2);
+        color: #ffaaaa;
+    }
+
+    /* External Image Positioning (Inverse Zig-Zag) */
+    .h-entry {
+        position: relative;
+        --img-offset: 15px;
+    }
+    .h-entry.has-date { --img-offset: 48px; }
+    .h-entry.has-tags { --img-offset: 45px; }
+    .h-entry.has-date.has-tags { --img-offset: 80px; }
+
+    .card-img-wrapper.detached {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 250px;
+        height: 150px;
+        z-index: 1;
+    }
+    .card-img-wrapper.detached .card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+        margin: 0;
+        display: block;
+    }
+    /* Animated corner frame */
+    .card-img-frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 6px;
+        box-sizing: border-box;
+    }
+    .card-img-frame::before,
+    .card-img-frame::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-style: solid;
+        border-color: var(--entry-color, var(--tl-text-muted));
+        transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
+        z-index: 1;
+        pointer-events: none;
+    }
+    .card-img-frame::before {
+        top: 0;
+        left: 0;
+        border-width: 2px 0 0 2px;
+        border-radius: 4px 0 0 0;
+    }
+    .card-img-frame::after {
+        bottom: 0;
+        right: 0;
+        border-width: 0 2px 2px 0;
+        border-radius: 0 0 4px 0;
+    }
+    .card-img-frame:hover::before,
+    .card-img-frame:hover::after {
+        width: 100%;
+        height: 100%;
+        border-color: var(--entry-color, var(--tl-primary));
+    }
+    .card-img-frame:hover::before {
+        border-radius: 4px 0 0 4px;
+    }
+    .card-img-frame:hover::after {
+        border-radius: 0 4px 4px 0;
+    }
+    /* Connector line from image to center point */
+    .card-img-wrapper.detached::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        border-left: var(--tl-line-width, 2px) solid var(--tl-line-color, var(--entry-color, var(--tl-text-muted)));
+    }
+    /* Odd (Block Top) -> Image Bottom */
+    .h-entry:nth-child(odd) .card-img-wrapper.detached {
+        top: var(--img-offset);
+    }
+    .h-entry:nth-child(odd) .card-img-wrapper.detached::before {
+        bottom: 100%;
+        height: var(--img-offset);
+    }
+    /* Even (Block Bottom) -> Image Top */
+    .h-entry:nth-child(even) .card-img-wrapper.detached {
+        top: auto;
+        bottom: var(--img-offset);
+    }
+    .h-entry:nth-child(even) .card-img-wrapper.detached::before {
+        top: 100%;
+        height: var(--img-offset);
+    }
+
+    /* Ensure scroll areas are scrollable */
+    .timeline-scroll-area {
+        flex: 1;
+        overflow: auto;
+    }
+    .timeline-tabs {
+        flex-shrink: 0;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Minimalist "Ghost" Scrollbar */
+    .timeline-scroll-area::-webkit-scrollbar,
+    .card-box::-webkit-scrollbar,
+    .filter-dropdown::-webkit-scrollbar,
+    .timeline-tabs::-webkit-scrollbar {
+        width: 6px !important;
+        height: 6px !important;
+        background: transparent !important;
+    }
+    .timeline-scroll-area::-webkit-scrollbar-track,
+    .card-box::-webkit-scrollbar-track,
+    .filter-dropdown::-webkit-scrollbar-track,
+    .timeline-tabs::-webkit-scrollbar-track {
+        background: transparent !important;
+        margin: 0 !important;
+    }
+    .timeline-scroll-area::-webkit-scrollbar-thumb,
+    .card-box::-webkit-scrollbar-thumb,
+    .filter-dropdown::-webkit-scrollbar-thumb,
+    .timeline-tabs::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px !important;
+        border: none !important;
+        transition: background-color 0.3s;
+    }
+    .timeline-scroll-area::-webkit-scrollbar-thumb:hover,
+    .card-box::-webkit-scrollbar-thumb:hover,
+    .filter-dropdown::-webkit-scrollbar-thumb:hover,
+    .timeline-tabs::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 152, 0, 0.6) !important;
+    }
+
+    /* Timeline scroll-area: thicker & more visible horizontal scrollbar */
+    .timeline-scroll-area::-webkit-scrollbar {
+        height: 12px !important;
+    }
+    .timeline-scroll-area::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.35) !important;
+    }
+    .timeline-scroll-area::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 152, 0, 0.7) !important;
+    }
+
+    /* Firefox Support (Standard CSS) */
+    .timeline-scroll-area {
+        scrollbar-width: auto;
+        scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    }
+    .card-box,
+    .filter-dropdown,
+    .timeline-tabs {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    }
+
+    .no-timelines-viewer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #aaa;
+        text-align: center;
+    }
+    .home-illustration {
+        max-width: 150px;
+        margin-bottom: 20px;
+    }
+
+    /* Lightbox Overlay */
+    .timeline-lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        cursor: zoom-out;
+        animation: lightbox-fade-in 0.2s ease;
+    }
+    @keyframes lightbox-fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .timeline-lightbox img {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 6px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+        cursor: default;
+    }
+
+    /* Make card images look clickable */
+    .card-img-frame {
+        cursor: zoom-in;
+    }
+
+    /* === Main Line Styles === */
+
+    /* Dashed (Map / Indiana Jones) */
+    .track-line.line-style-dashed {
+        background: repeating-linear-gradient(
+            90deg,
+            var(--tl-line-color, var(--tl-border)) 0px,
+            var(--tl-line-color, var(--tl-border)) 12px,
+            transparent 12px,
+            transparent 20px
+        ) !important;
+        animation: tl-line-march 1.5s linear infinite;
+    }
+    @keyframes tl-line-march {
+        0%   { background-position: 0 0; }
+        100% { background-position: 20px 0; }
+    }
+    /* Dashed: Stem (entry -> dot) */
+    .track-style-dashed .h-entry::after {
+        background: repeating-linear-gradient(
+            180deg,
+            var(--tl-line-color, var(--tl-border)) 0px,
+            var(--tl-line-color, var(--tl-border)) 6px,
+            transparent 6px,
+            transparent 10px
+        ) !important;
+    }
+    /* Dashed: Image connector */
+    .track-style-dashed .card-img-wrapper.detached::before {
+        border-left-style: dashed !important;
+    }
+
+    /* Rough / Ink (Parchment) */
+    .track-line.line-style-rough {
+        filter: url(#tl-rough-filter);
+        height: var(--tl-line-width, 2px);
+    }
+    /* Rough: Stem (entry -> dot) */
+    .track-style-rough .h-entry::after {
+        filter: url(#tl-rough-filter);
+    }
+    /* Rough: Image connector */
+    .track-style-rough .card-img-wrapper.detached::before {
+        filter: url(#tl-rough-filter);
+    }
+
+    /* === Main Line Effects === */
+
+    /* Flow */
+    .track-line.line-effect-flow::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 120px;
+        height: 14px;
+        background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 40%, transparent 70%);
+        filter: blur(3px);
+        pointer-events: none;
+        animation: tl-line-flow 8s linear infinite;
+    }
+    @keyframes tl-line-flow {
+        0% { left: 0; }
+        100% { left: 100%; }
+    }
+
+    /* Pulse */
+    .track-line.line-effect-pulse {
+        animation: tl-line-pulse 3s ease-in-out infinite;
+    }
+    .track-effect-pulse .h-entry::after {
+        animation: tl-line-pulse 3s ease-in-out infinite;
+    }
+    .track-effect-pulse .card-img-wrapper.detached::before {
+        animation: tl-line-pulse-border 3s ease-in-out infinite;
+    }
+    @keyframes tl-line-pulse {
+        0%, 100% { opacity: 0.4; box-shadow: 0 0 0px transparent; }
+        50%      { opacity: 1;   box-shadow: 0 0 8px var(--tl-line-color, var(--tl-border)); }
+    }
+    @keyframes tl-line-pulse-border {
+        0%, 100% { opacity: 0.4; }
+        50%      { opacity: 1; }
+    }
+
+    /* Glitch */
+    .track-line.line-effect-glitch {
+        animation: tl-line-glitch 4s steps(1) infinite;
+    }
+    .track-effect-glitch .h-entry::after {
+        animation: tl-line-glitch-stem 4s steps(1) infinite;
+    }
+    @keyframes tl-line-glitch {
+        0%   { transform: translateY(0);  filter: none; }
+        7%   { transform: translateY(-3px); filter: hue-rotate(90deg); }
+        8%   { transform: translateY(2px);  filter: hue-rotate(-60deg); }
+        9%   { transform: translateY(0);  filter: none; }
+        32%  { transform: translateY(0);  filter: none; }
+        33%  { transform: translateY(1px);  filter: hue-rotate(180deg) brightness(1.5); }
+        35%  { transform: translateY(-2px); filter: hue-rotate(45deg); }
+        36%  { transform: translateY(0);  filter: none; }
+        58%  { transform: translateY(0);  filter: none; }
+        59%  { transform: translateY(-1px); filter: hue-rotate(-90deg) brightness(2); }
+        60%  { transform: translateY(3px);  filter: hue-rotate(120deg); }
+        61%  { transform: translateY(0);  filter: none; }
+        85%  { transform: translateY(0);  filter: none; }
+        86%  { transform: translateY(2px);  filter: hue-rotate(200deg); }
+        87%  { transform: translateY(-1px); filter: hue-rotate(-45deg) brightness(1.3); }
+        88%  { transform: translateY(0);  filter: none; }
+        100% { transform: translateY(0);  filter: none; }
+    }
+    @keyframes tl-line-glitch-stem {
+        0%   { transform: translateX(0); }
+        7%   { transform: translateX(-2px); }
+        9%   { transform: translateX(0); }
+        33%  { transform: translateX(1px); }
+        36%  { transform: translateX(0); }
+        59%  { transform: translateX(2px); }
+        61%  { transform: translateX(0); }
+        86%  { transform: translateX(-1px); }
+        88%  { transform: translateX(0); }
+        100% { transform: translateX(0); }
+    }
+
+    /* Neon Flicker */
+    .track-line.line-effect-neon {
+        animation: tl-line-neon 5s ease-in-out infinite;
+        box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)),
+                    0 0 12px var(--tl-line-color, var(--tl-border));
+    }
+    .track-effect-neon .h-entry::after {
+        animation: tl-line-neon-stem 5s ease-in-out infinite;
+        box-shadow: 0 0 4px var(--tl-line-color, var(--tl-border));
+    }
+    .track-effect-neon .card-img-wrapper.detached::before {
+        animation: tl-line-neon-stem 5s ease-in-out infinite;
+    }
+    @keyframes tl-line-neon {
+        0%   { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+        4%   { opacity: 0.2;  box-shadow: 0 0 1px var(--tl-line-color, var(--tl-border)); }
+        6%   { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+        8%   { opacity: 0.6;  box-shadow: 0 0 3px var(--tl-line-color, var(--tl-border)); }
+        10%  { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+        50%  { opacity: 1;    box-shadow: 0 0 8px var(--tl-line-color, var(--tl-border)), 0 0 18px var(--tl-line-color, var(--tl-border)); }
+        52%  { opacity: 0.3;  box-shadow: 0 0 1px var(--tl-line-color, var(--tl-border)); }
+        53%  { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+        78%  { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+        80%  { opacity: 0.15; box-shadow: 0 0 1px var(--tl-line-color, var(--tl-border)); }
+        81%  { opacity: 0.8;  box-shadow: 0 0 4px var(--tl-line-color, var(--tl-border)); }
+        82%  { opacity: 0.2;  box-shadow: 0 0 1px var(--tl-line-color, var(--tl-border)); }
+        84%  { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+        100% { opacity: 1;    box-shadow: 0 0 6px var(--tl-line-color, var(--tl-border)), 0 0 14px var(--tl-line-color, var(--tl-border)); }
+    }
+    @keyframes tl-line-neon-stem {
+        0%   { opacity: 1; }
+        4%   { opacity: 0.2; }
+        6%   { opacity: 1; }
+        8%   { opacity: 0.6; }
+        10%  { opacity: 1; }
+        52%  { opacity: 0.3; }
+        53%  { opacity: 1; }
+        80%  { opacity: 0.15; }
+        82%  { opacity: 0.2; }
+        84%  { opacity: 1; }
+        100% { opacity: 1; }
+    }
+
+    /* Chroma / Spectrum */
+    .track-line.line-effect-chroma {
+        background: linear-gradient(90deg,
+            #ff0000, #ff8800, #ffff00, #00ff00,
+            #0088ff, #8800ff, #ff00ff, #ff0000
+        ) !important;
+        background-size: 400% 100% !important;
+        animation: tl-line-chroma 8s linear infinite;
+    }
+    .track-effect-chroma .h-entry::after {
+        background: linear-gradient(180deg,
+            #ff0000, #ff8800, #ffff00, #00ff00,
+            #0088ff, #8800ff, #ff00ff, #ff0000
+        ) !important;
+        background-size: 100% 400% !important;
+        animation: tl-line-chroma-v 8s linear infinite;
+    }
+    .track-effect-chroma .card-img-wrapper.detached::before {
+        border-image: linear-gradient(180deg,
+            #ff0000, #ff8800, #ffff00, #00ff00,
+            #0088ff, #8800ff, #ff00ff, #ff0000
+        ) 1 !important;
+        border-left-style: solid !important;
+        animation: tl-line-chroma-border 8s linear infinite;
+    }
+    @keyframes tl-line-chroma {
+        0%   { background-position: 0% 50%; }
+        100% { background-position: 400% 50%; }
+    }
+    @keyframes tl-line-chroma-v {
+        0%   { background-position: 50% 0%; }
+        100% { background-position: 50% 400%; }
+    }
+    @keyframes tl-line-chroma-border {
+        0%   { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+    }
+
+    /* === Dot Shape Variants === */
+
+    /* Filled Circle */
+    .dot-shape-filled-circle .h-entry::before {
+        background: color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #000 30%);
+        border: 2px solid color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #fff 30%);
+        box-shadow: none;
+    }
+    .dot-shape-filled-circle .h-entry[style*="--entry-color"]::before {
+        background: color-mix(in srgb, var(--entry-color), #000 30%);
+        border-color: color-mix(in srgb, var(--entry-color), #fff 30%);
+        box-shadow: none;
+    }
+
+    /* Square (ring style but square) */
+    .dot-shape-square .h-entry::before {
+        border-radius: 2px;
+    }
+    .dot-shape-square .h-entry[style*="--entry-color"]::before {
+        border-radius: 2px;
+    }
+
+    /* Filled Square */
+    .dot-shape-filled-square .h-entry::before {
+        border-radius: 2px;
+        background: color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #000 30%);
+        border: 2px solid color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #fff 30%);
+        box-shadow: none;
+    }
+    .dot-shape-filled-square .h-entry[style*="--entry-color"]::before {
+        border-radius: 2px;
+        background: color-mix(in srgb, var(--entry-color), #000 30%);
+        border-color: color-mix(in srgb, var(--entry-color), #fff 30%);
+        box-shadow: none;
+    }
+  </style>
+
+  <!-- SVG Filter for Rough/Ink line style -->
+  <svg style="position:absolute;width:0;height:0;pointer-events:none;">
+    <filter id="tl-rough-filter">
+      <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="4" seed="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </svg>
+  
+  {{#if hasTimelines}}
+  <!-- Navigation Tabs -->
+  <nav class="timeline-tabs">
+    {{#each timelines}}
+    <button type="button"
+            class="timeline-tab {{#if (eq this.id ../selectedTimeline.id)}}active{{/if}}"
+            data-action="selectTimeline"
+            data-timeline-id="{{this.id}}">
+      {{this.name}}
+    </button>
+    {{/each}}
+  </nav>
+
+  <!-- Tag Filters (Left Floating Menu) -->
+  {{#if allTags.length}}
+  <div class="timeline-filter-menu">
+    <!-- Round Icon -->
+    <div class="filter-icon-btn {{#if hasActiveFilters}}active{{/if}}">
+      <i class="fa-solid fa-filter"></i>
+    </div>
+    
+    <!-- Dropdown List (Appears on Hover) -->
+    <div class="filter-dropdown">
+      {{#each allTags}}
+      <span class="filter-tag-chip {{#if this.active}}on{{else}}off{{/if}}"
+            style="{{this.glassStyle}}"
+            data-action="toggleTagFilter"
+            data-tag-id="{{this.id}}">
+        {{this.label}}
+      </span>
+      {{/each}}
+
+      {{#if hasActiveFilters}}
+      <button type="button" class="filter-clear-btn" data-action="clearFilters">
+        <i class="fa-solid fa-times"></i> Clear Filters
+      </button>
+      {{/if}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- Horizontal Timeline Content -->
+  <div class="timeline-scroll-area" id="timelineScrollContainer" style="padding-top: 10px; padding-bottom: 10px; {{#if selectedTimeline.backgroundImage}}background: transparent;{{/if}}">
+    {{#if selectedTimeline}}
+      {{#if selectedTimeline.entries.length}}
+      <div class="timeline-track {{#if (eq selectedTimeline.lineStyle 'dashed')}}track-style-dashed{{/if}} {{#if (eq selectedTimeline.lineStyle 'rough')}}track-style-rough{{/if}} {{#if (eq selectedTimeline.lineEffect 'pulse')}}track-effect-pulse{{/if}} {{#if (eq selectedTimeline.lineEffect 'glitch')}}track-effect-glitch{{/if}} {{#if (eq selectedTimeline.lineEffect 'neon')}}track-effect-neon{{/if}} {{#if (eq selectedTimeline.lineEffect 'chroma')}}track-effect-chroma{{/if}} {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}}" style="margin-top: 0; margin-bottom: 0; {{#if selectedTimeline.lineWidth}}--tl-line-width: {{selectedTimeline.lineWidth}}px;{{/if}}{{#if selectedTimeline.lineColor}}--tl-line-color: {{selectedTimeline.lineColor}};{{/if}}{{#if selectedTimeline.dotSize}}--tl-dot-size: {{selectedTimeline.dotSize}}px;{{/if}}">
+        <!-- The central line -->
+        <div class="track-line {{#if (eq selectedTimeline.lineStyle 'dashed')}}line-style-dashed{{/if}} {{#if (eq selectedTimeline.lineStyle 'rough')}}line-style-rough{{/if}} {{#if (eq selectedTimeline.lineEffect 'flow')}}line-effect-flow{{/if}} {{#if (eq selectedTimeline.lineEffect 'pulse')}}line-effect-pulse{{/if}} {{#if (eq selectedTimeline.lineEffect 'glitch')}}line-effect-glitch{{/if}} {{#if (eq selectedTimeline.lineEffect 'neon')}}line-effect-neon{{/if}} {{#if (eq selectedTimeline.lineEffect 'chroma')}}line-effect-chroma{{/if}}"
+             style="{{#if selectedTimeline.lineWidth}}height: {{selectedTimeline.lineWidth}}px;{{/if}}{{#if selectedTimeline.lineColor}}background: {{selectedTimeline.lineColor}};{{/if}}"></div>
+
+        {{#each selectedTimeline.entries}}
+        <!-- Entry Block -->
+        <div class="h-entry {{#if this.hidden}}hidden-entry{{/if}} {{#if this.hasMystery}}mystery-entry{{/if}} {{#if this.displayEffect}}effect-{{this.displayEffect}}{{/if}}"
+             style="{{#if this.displayColor}}--entry-color: {{this.displayColor}};{{/if}}{{#if this.displayEffectColor}}--effect-color: {{this.displayEffectColor}};{{/if}}">
+
+          {{!-- Timeframe --}}
+          {{#if this.mysteryTimeframe}}
+          <span class="entry-date mystery-redacted" style="color: #fff; border: 1px solid var(--entry-color); font-size: 14px;">???</span>
+          {{else if this.period}}
+          <span class="entry-date" style="color: #fff; border: 1px solid var(--entry-color); font-size: 14px;">
+            {{#if this.mystery.timeframe}}<i class="fa-solid fa-mask" style="font-size: 10px; color: #a855f7; margin-right: 4px;" title="Mystery"></i>{{/if}}
+            {{this.period}}
+          </span>
+          {{/if}}
+
+          {{!-- Card Content --}}
+          <div class="card-box {{#if this.mysteryText}}mystery-text{{/if}}" style="max-height: 240px; overflow-y: auto;">
+            {{#if this.mysteryText}}
+            <h3 class="card-title mystery-redacted" style="text-align: center;">
+              <span class="mystery-placeholder">???</span>
+            </h3>
+            {{else}}
+            <h3 class="card-title">
+               {{#if this.hidden}}<i class="fa-solid fa-eye-slash hidden-icon" title="Hidden from players"></i>{{/if}}
+               {{#if this.mystery.text}}<i class="fa-solid fa-mask hidden-icon" title="Mystery: text" style="color: #a855f7;"></i>{{/if}}
+               {{this.name}}
+               {{#if this.pageUuid}}<span class="card-page-link" data-action="openLinkedPage" data-page-uuid="{{this.pageUuid}}" title="{{this.pageName}}"><i class="fa-solid fa-file-lines"></i></span>{{/if}}
+            </h3>
+
+            {{#if this.description}}
+            <p class="card-desc">{{this.description}}</p>
+            {{/if}}
+
+            {{#if this.tags.length}}
+            <div class="card-tags">
+              {{#each this.tags}}
+              <span class="tag-pill" style="{{this.style}}">{{this.label}}</span>
+              {{/each}}
+            </div>
+            {{/if}}
+            {{/if}}
+
+          </div>
+
+
+          {{!-- Image --}}
+          {{#if this.mysteryImg}}
+          <div class="card-img-wrapper detached">
+            <div class="card-img-frame">
+              <img src="modules/timeline-builder/assets/images/mystery.webp" class="card-img" alt="Mystery"
+                   style="object-position: center;"
+                   loading="lazy">
+            </div>
+          </div>
+          {{else if this.img}}
+          <div class="card-img-wrapper detached">
+            <div class="card-img-frame">
+              {{#if this.mystery.img}}<div class="mystery-img-overlay"><i class="fa-solid fa-mask"></i></div>{{/if}}
+              <img src="{{this.img}}" class="card-img" alt="{{this.name}}"
+                   style="object-position: {{#if this.imgPosition}}{{this.imgPosition.x}}% {{this.imgPosition.y}}%{{else}}center{{/if}};"
+                   loading="lazy">
+            </div>
+          </div>
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+        <p class="no-entries">This timeline is empty.</p>
+      {{/if}}
+    {{else}}
+      <div class="no-timelines-viewer">
+         <p>Select a timeline.</p>
+      </div>
+    {{/if}}
+  </div>
+
+  {{else}}
+  <div class="no-timelines-viewer">
+    <img src="modules/timeline-builder/assets/images/avatar.webp" class="home-illustration">
+    <p>No timeline available.</p>
+  </div>
+  {{/if}}
+</div>

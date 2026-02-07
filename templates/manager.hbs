@@ -1,0 +1,243 @@
+<div class="timeline-manager-container">
+  <style>
+    /* High Contrast & Readability Improvements */
+    .timeline-manager-container {
+        --tl-bg-dark: #111111;
+        --tl-bg-panel: #1a1a1a;
+        --tl-bg-card: #222222;
+        --tl-text-main: #f0f0f0;
+        --tl-text-muted: #aaaaaa;
+        --tl-border: #444444;
+        --tl-input-bg: rgba(0, 0, 0, 0.4);
+        
+        color: var(--tl-text-main);
+        background-color: var(--tl-bg-panel);
+    }
+
+    .timeline-sidebar {
+        background-color: var(--tl-bg-dark);
+        border-right: 1px solid var(--tl-border);
+    }
+
+    .timeline-item {
+        color: var(--tl-text-muted);
+    }
+    .timeline-item:hover {
+        color: var(--tl-text-main);
+        background: rgba(255,255,255,0.05);
+    }
+    .timeline-item.selected {
+        color: #fff;
+        background: #123915;
+        font-weight: 600;
+    }
+
+    .timeline-entry {
+        background-color: var(--tl-bg-card);
+        border: 1px solid var(--tl-border);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    input[type="text"], textarea {
+        color: var(--tl-text-main) !important;
+        background: var(--tl-input-bg);
+        border: 1px solid transparent;
+    }
+    input[type="text"]:focus, textarea:focus {
+        border-color: var(--tl-primary, #2ec4a0);
+        background: rgba(0,0,0,0.6);
+    }
+    
+    .entry-description {
+        color: var(--tl-text-muted) !important;
+    }
+    
+    ::placeholder {
+        color: #666 !important;
+    }
+  </style>
+  
+  <!-- SIDEBAR: Timeline List -->
+  <aside class="timeline-sidebar">
+    <header class="sidebar-header">
+      <h3>Timelines</h3>
+      <div style="display: flex; gap: 4px;">
+        <button type="button" class="create-btn" data-action="manageColors" data-tooltip="Manage Colors">
+          <i class="fa-solid fa-palette"></i>
+        </button>
+        <button type="button" class="create-btn" data-action="manageTags" data-tooltip="Manage Tags">
+          <i class="fa-solid fa-tags"></i>
+        </button>
+        <button type="button" class="create-btn" data-action="createTimeline" data-tooltip="Create Timeline">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+    </header>
+
+    <ul class="timeline-list">
+      {{#each timelines}}
+      <li class="timeline-item {{#if (eq this.id ../selectedTimeline.id)}}selected{{/if}}"
+          data-action="selectTimeline"
+          data-timeline-id="{{this.id}}"
+          style="display: flex; align-items: center; justify-content: space-between; padding-right: 5px;">
+        <span class="timeline-nav-name">
+          {{this.name}}
+        </span>
+      </li>
+      {{/each}}
+    </ul>
+  </aside>
+
+  <!-- MAIN: Editor Area -->
+  <main class="timeline-editor">
+    {{#if selectedTimeline}}
+    
+    <!-- Toolbar Superior -->
+    <header class="editor-header">
+      <div class="header-title-group">
+        <input type="text" class="timeline-name-input" value="{{selectedTimeline.name}}" placeholder="Timeline Name" maxlength="25">      
+        
+        <!-- Timeline Meta Actions -->
+        <div class="timeline-meta-actions">
+            <button type="button" class="icon-btn" data-action="configureTimeline" data-timeline-id="{{selectedTimeline.id}}" data-tooltip="Timeline Settings">
+                <i class="fa-solid fa-gear"></i> Settings
+            </button>
+            <button type="button" class="icon-btn" data-action="sortTimeline" data-timeline-id="{{selectedTimeline.id}}" data-tooltip="Sort Timeline">
+                <i class="fa-solid fa-sort-amount-down"></i> Sort
+            </button>
+            <button type="button" class="icon-btn" data-action="toggleVisibility" data-timeline-id="{{selectedTimeline.id}}"
+                    style="{{#if selectedTimeline.visible}}color: #2ec4a0;{{else}}color: #ff6b6b;{{/if}}"
+                    data-tooltip="{{#if selectedTimeline.visible}}Visible to Players (Click to Hide){{else}}Hidden from Players (Click to Show){{/if}}">
+                <i class="fa-solid {{#if selectedTimeline.visible}}fa-eye{{else}}fa-eye-slash{{/if}}"></i> {{#if selectedTimeline.visible}}Showing{{else}}Hiding{{/if}}
+            </button>
+            <button type="button" class="icon-btn" data-action="managePermissions" data-timeline-id="{{selectedTimeline.id}}" data-tooltip="User Permissions">
+                <i class="fa-solid fa-users-gear"></i>
+            </button>
+            <button type="button" class="icon-btn danger" data-action="deleteTimeline" data-timeline-id="{{selectedTimeline.id}}" data-tooltip="Delete Timeline">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="add-entry-btn" data-action="addEntry">
+          <i class="fa-solid fa-plus"></i> <span class="btn-label">Event</span>
+        </button>
+        <button type="button" class="add-entry-btn preview-btn" data-action="openViewer" data-tooltip="Open Timeline Viewer">
+          <i class="fa-solid fa-up-right-from-square"></i> <span class="btn-label">Preview</span>
+        </button>
+        <button type="button" class="add-entry-btn broadcast-btn" data-action="broadcastTimeline" data-tooltip="Show this timeline to all connected players" style="padding: 0; width: 32px; min-width: 32px;">
+          <i class="fa-solid fa-tower-broadcast"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Event List -->
+    <section class="entry-list-container {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}}" {{#if selectedTimeline.dotSize}}style="--tl-dot-size: {{selectedTimeline.dotSize}}px;"{{/if}}>
+
+      <!-- Visual Vertical Line -->
+      <div class="timeline-guide-line"></div>
+
+      <div class="entry-list">
+        {{#each selectedTimeline.entries}}
+        <article class="timeline-entry {{#if this.hidden}}entry-hidden{{/if}}" data-entry-id="{{this.id}}" draggable="true">
+          
+          <!-- COLUMN 1: Time -->
+          <div class="entry-col-time">
+            <div class="entry-drag-handle">
+                <i class="fa-solid fa-grip-vertical"></i>
+            </div>
+            
+            <div class="time-wrapper">
+                <input type="text" class="entry-period" value="{{this.period}}" placeholder="Timeframe">
+                <!-- The Dot -->
+                <div class="timeline-dot" style="--dot-color: {{this.displayColor}}; background-color: {{this.displayColor}}"></div>
+            </div>
+          </div>
+
+          <!-- COLUMN 2: Content -->
+          <div class="entry-col-content">
+            <input type="text" class="entry-name" value="{{this.name}}" placeholder="Event Title">
+            <textarea class="entry-description" placeholder="Description..." rows="1" maxlength="2000">{{this.description}}</textarea>
+            
+            <!-- Action Chips (Appear on Hover) -->
+            <div class="quick-actions">
+                <button type="button" class="chip-btn" data-action="pickTags" data-entry-id="{{this.id}}" data-tooltip="Manage Tags">
+                    <i class="fa-solid fa-tag" {{#if this.tagIds.length}}style="color: #e0a526"{{/if}}></i> Tags
+                </button>
+                <button type="button" class="chip-btn" data-action="pickImage" data-entry-id="{{this.id}}" data-tooltip="Attach Image">
+                    <i class="fa-solid fa-image" {{#if this.img}}style="color: #3b9fd6"{{/if}}></i> Img
+                </button>
+                {{#if this.img}}
+                <button type="button" class="chip-btn" data-action="adjustImageFocus" data-entry-id="{{this.id}}" data-tooltip="Adjust Focus">
+                    <i class="fa-solid fa-crop-simple"></i> Focus
+                </button>
+                {{/if}}
+                <button type="button" class="chip-btn" data-action="pickColor" data-entry-id="{{this.id}}" data-tooltip="Marker Color">
+                    <i class="fa-solid fa-palette" {{#if this.color}}style="color: {{this.color}}"{{/if}}></i> Color
+                </button>
+                <button type="button" class="chip-btn" data-action="pickEffect" data-entry-id="{{this.id}}" data-tooltip="Visual Effect">
+                    <i class="fa-solid fa-wand-magic-sparkles" {{#if this.effect}}{{#unless (eq this.effect 'none')}}style="color: #c75dd6"{{/unless}}{{/if}}></i> Effect
+                </button>
+                <button type="button" class="chip-btn" data-action="configureMystery" data-entry-id="{{this.id}}" data-tooltip="Mystery Mode">
+                    <i class="fa-solid fa-mask" {{#if this.hasMystery}}style="color: #a855f7"{{/if}}></i> Mystery
+                </button>
+
+                {{!-- Page Link Drop Zone --}}
+                <div class="page-drop-zone" data-entry-id="{{this.id}}">
+                  {{#if this.pageUuid}}
+                  <div class="page-link-indicator" data-action="openLinkedPage" data-entry-id="{{this.id}}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span class="page-link-name">{{this.pageName}}</span>
+                    <button type="button" class="page-link-remove" data-action="removeLinkedPage" data-entry-id="{{this.id}}">
+                      <i class="fa-solid fa-times"></i>
+                    </button>
+                  </div>
+                  {{else}}
+                  <div class="page-drop-placeholder">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span>Drag a Page Here</span>
+                  </div>
+                  {{/if}}
+                </div>
+            </div>
+          </div>
+
+          <!-- COLUMN 3: Meta -->
+          <div class="entry-col-meta">
+            <button type="button" class="meta-btn" data-action="toggleEntryVisibility" data-entry-id="{{this.id}}"
+                    style="{{#if this.hidden}}color: #ff6b6b;{{else}}color: #2ec4a0;{{/if}}"
+                    data-tooltip="{{#if this.hidden}}Hidden from Players (Click to Show){{else}}Visible to Players (Click to Hide){{/if}}">
+                <i class="fa-solid {{#if this.hidden}}fa-eye-slash{{else}}fa-eye{{/if}}"></i>
+            </button>
+            <button type="button" class="meta-btn danger" data-action="deleteEntry" data-entry-id="{{this.id}}" data-tooltip="Delete Entry">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+            <button type="button" class="meta-btn" data-action="insertEntry" data-entry-id="{{this.id}}" data-tooltip="Insert Entry Below">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+
+        </article>
+        {{/each}}
+        
+        {{#unless selectedTimeline.entries.length}}
+        <div class="no-entries">
+            <p>No events registered. Click <b>+ Event</b> to start.</p>
+        </div>
+        {{/unless}}
+
+        <!-- Extra padding for scroll -->
+        <div style="height: 40px;"></div>
+      </div>
+    </section>
+    
+    {{else}}
+    <div class="no-selection">
+      <img src="modules/timeline-builder/assets/images/avatar.webp" class="home-illustration">
+      <h2>Welcome to Timeline Builder</h2>
+      <p>Select a timeline from the sidebar or create a new one to get started.</p>
+    </div>
+    {{/if}}
+  </main>
+</div>
