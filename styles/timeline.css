@@ -736,6 +736,14 @@
 .timeline-builder .h-entry:nth-child(odd) .entry-date { top: 20px; }
 .timeline-builder .h-entry:nth-child(even) .entry-date { bottom: 20px; }
 
+/* When image is present, move timeframe beyond the image (outer edge) */
+.timeline-builder .h-entry:nth-child(odd).has-image .entry-date {
+  top: calc(var(--img-offset) + 158px);
+}
+.timeline-builder .h-entry:nth-child(even).has-image .entry-date {
+  bottom: calc(var(--img-offset) + 158px);
+}
+
 /* --- Tags Positioning --- */
 .timeline-builder .h-entry > .card-tags {
   margin: 0;

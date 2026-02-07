@@ -20,7 +20,7 @@ export class TimelineWelcome extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _prepareContext() {
     return {
-      journalUuid: "Compendium.timeline-builder.journal.JournalEntry.nmEPLrplwb6WaVdc.JournalEntryPage.jv3upaYcDplYSzm0"
+      journalUuid: "Compendium.timeline-builder.journal.JournalEntry.nmEPLrplwb6WaVdc"
     };
   }
 
