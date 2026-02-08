@@ -342,24 +342,22 @@
 }
 
 /* Dot Shape: Filled Circle */
-.timeline-builder .dot-shape-filled-circle .timeline-dot {
-  background-color: color-mix(in srgb, var(--dot-color), #000 30%) !important;
-  border: 2px solid color-mix(in srgb, var(--dot-color), #fff 30%);
+.timeline-builder .dot-shape-filled-circle .h-entry::before {
+  background-color: color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #000 30%) !important;
+  border: 2px solid color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #fff 30%);
   box-shadow: none;
 }
 
 /* Dot Shape: Square (ring style but square) */
-.timeline-builder .dot-shape-square .timeline-dot {
+.timeline-builder .dot-shape-square .h-entry::before {
   border-radius: 2px;
-  border: 2px solid var(--tl-bg);
-  box-shadow: 0 0 0 1px var(--tl-border);
 }
 
 /* Dot Shape: Filled Square */
-.timeline-builder .dot-shape-filled-square .timeline-dot {
+.timeline-builder .dot-shape-filled-square .h-entry::before {
   border-radius: 2px;
-  background-color: color-mix(in srgb, var(--dot-color), #000 30%) !important;
-  border: 2px solid color-mix(in srgb, var(--dot-color), #fff 30%);
+  background-color: color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #000 30%) !important;
+  border: 2px solid color-mix(in srgb, var(--entry-color, var(--tl-text-muted)), #fff 30%);
   box-shadow: none;
 }
 
@@ -632,6 +630,125 @@
   background: var(--tl-line-color, var(--tl-border));
   height: var(--tl-line-width, 2px);
   z-index: 0;
+}
+
+/* --- Line Styles --- */
+
+/* Dashed: main line + stems */
+.timeline-builder .track-line.line-style-dashed {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--tl-line-color, var(--tl-border)) 0,
+    var(--tl-line-color, var(--tl-border)) 8px,
+    transparent 8px,
+    transparent 14px
+  );
+}
+.timeline-builder .track-style-dashed .h-entry::after {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--tl-line-color, var(--tl-border)) 0,
+    var(--tl-line-color, var(--tl-border)) 6px,
+    transparent 6px,
+    transparent 10px
+  );
+}
+
+/* Rough / Ink: apply SVG turbulence filter */
+.timeline-builder .track-line.line-style-rough {
+  filter: url(#tl-rough-filter);
+}
+.timeline-builder .track-style-rough .h-entry::after {
+  filter: url(#tl-rough-filter);
+}
+
+/* --- Line Effects --- */
+
+/* Flow: small glowing sphere that travels along the line */
+@keyframes timeline-builder-line-flow {
+  0%   { left: -20px; }
+  100% { left: 100%; }
+}
+.timeline-builder .track-line.line-effect-flow {
+  overflow: visible;
+}
+.timeline-builder .track-line.line-effect-flow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 4px 2px rgba(255, 255, 255, 0.9),
+    0 0 10px 5px rgba(255, 255, 255, 0.5),
+    0 0 20px 10px rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  animation: timeline-builder-line-flow 6s linear infinite;
+}
+
+/* Pulse: the line breathes in opacity */
+@keyframes timeline-builder-line-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+.timeline-builder .track-line.line-effect-pulse {
+  animation: timeline-builder-line-pulse 2s ease-in-out infinite;
+}
+.timeline-builder .track-effect-pulse .h-entry::after {
+  animation: timeline-builder-line-pulse 2s ease-in-out infinite;
+}
+
+/* Glitch: jitter displacement */
+@keyframes timeline-builder-line-glitch {
+  0%, 90%, 100% { transform: translateY(-50%); filter: none; }
+  91% { transform: translate(-2px, calc(-50% + 1px)); filter: hue-rotate(90deg); }
+  92% { transform: translate(1px, calc(-50% - 1px)); filter: none; }
+  93% { transform: translate(-1px, calc(-50% + 2px)); filter: invert(0.2); }
+}
+.timeline-builder .track-line.line-effect-glitch {
+  animation: timeline-builder-line-glitch 4s infinite;
+}
+
+/* Neon Flicker */
+@keyframes timeline-builder-line-neon {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    box-shadow:
+      0 0 4px var(--tl-line-color, var(--tl-border)),
+      0 0 10px var(--tl-line-color, var(--tl-border)),
+      0 0 20px var(--tl-line-color, var(--tl-border));
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    box-shadow: none;
+    opacity: 0.6;
+  }
+}
+.timeline-builder .track-line.line-effect-neon {
+  animation: timeline-builder-line-neon 3s infinite;
+  box-shadow:
+    0 0 4px var(--tl-line-color, var(--tl-border)),
+    0 0 10px var(--tl-line-color, var(--tl-border));
+}
+
+/* Chroma / Spectrum: hue rotation */
+@keyframes timeline-builder-line-chroma-scroll {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes timeline-builder-line-chroma {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+.timeline-builder .track-line.line-effect-chroma {
+  background: linear-gradient(
+    90deg,
+    #ff0000, #ff7700, #ffff00, #00ff00, #0077ff, #8800ff, #ff0000
+  );
+  background-size: 200% 100%;
+  animation: timeline-builder-line-chroma-scroll 4s linear infinite, timeline-builder-line-chroma 6s linear infinite;
 }
 
 /* EACH EVENT (Horizontal Container) */
