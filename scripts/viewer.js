@@ -3,16 +3,14 @@
  */
 
 import { TEMPLATES, MODULE_ID, SETTINGS } from "./config.js";
-import { TimelineStore } from "./store.js";
 import { getGlassStyle, resolveEntryDisplayProps, resolvePageNames } from "./helpers.js";
-
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
+import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
 
 /**
  * Timeline Viewer Application for Players and GMs.
  * Horizontal layout with drag-to-scroll.
  */
-export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
+export class TimelineViewer extends BaseHandlebarsForm {
   /** Currently selected timeline ID for viewing */
   #selectedTimelineId = null;
   /** Active tag filters */
@@ -66,9 +64,10 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
    * Prepare context data for rendering.
    */
   async _prepareContext(options) {
-    const isGM = game.user.isGM;
-    const timelines = TimelineStore.getTimelines(!isGM);
-    const tags = TimelineStore.getTags();
+    const base = await super._prepareContext(options);
+    const isGM = base.isGM;
+    const timelines = this._getTimelines(!isGM);
+    const tags = this._getTags();
     const tagMap = new Map(tags.map(t => [t.id, t]));
 
     if (!this.#selectedTimelineId && timelines.length > 0) {
@@ -149,14 +148,13 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
     }
 
     return {
+      ...base,
       timelines,
       selectedTimeline: viewTimeline,
       hasTimelines: timelines.length > 0,
-      isGM,
       allTags,
       hasActiveFilters: this.#activeFilters.size > 0,
-      textFilter: this.#textFilter,
-      userAvatar: game.user.avatar
+      textFilter: this.#textFilter
     };
   }
 
@@ -164,6 +162,8 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
    * Setup interaction listeners (Scroll & Drag)
    */
   _onRender(context, options) {
+    super._onRender(context, options);
+
     const container = this.element.querySelector('#timelineScrollContainer');
     if (!container) return;
 
@@ -401,7 +401,7 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
 
     try {
       const doc = await fromUuid(uuid);
-      if (!doc) return ui.notifications.warn("Linked page not found.");
+      if (!doc) return this._notifyWarning("Linked page not found.");
 
       // JournalEntry (full journal) — open normally
       if (doc.pages) return doc.sheet?.render(true);
@@ -423,12 +423,11 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
         return doc.sheet?.render(true);
       }
 
-      await DialogV2.prompt({
-        classes: ["timeline-builder"],
-        window: { title: doc.name, icon, resizable: true },
-        content: `<div style="padding:10px; max-height: 65vh; overflow-y: auto;">${viewContent}</div>`,
-        ok: { label: "Close" },
+      await this._promptDialog(doc.name, `<div style="padding:10px; max-height: 65vh; overflow-y: auto;">${viewContent}</div>`, {
+        icon,
+        okLabel: "Close",
         position: { width: 560 },
+        window: { resizable: true },
         render: (event, dialog) => {
           const footer = dialog.element.querySelector(".form-footer");
           if (footer) footer.style.display = "none";
@@ -436,7 +435,7 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
       }).catch(() => {});
     } catch (err) {
       console.error("Timeline Builder | Error opening linked page:", err);
-      ui.notifications.error("Could not open the linked page.");
+      this._notifyError("Could not open the linked page.");
     }
   }
 

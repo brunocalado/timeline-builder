@@ -2,10 +2,9 @@
  * Timeline Builder - Welcome Screen
  */
 import { MODULE_ID, TEMPLATES } from "./config.js";
+import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
-
-export class TimelineWelcome extends HandlebarsApplicationMixin(ApplicationV2) {
+export class TimelineWelcome extends BaseHandlebarsForm {
   static DEFAULT_OPTIONS = {
     id: "timeline-welcome",
     classes: ["timeline-builder", "welcome-window"],
@@ -20,13 +19,16 @@ export class TimelineWelcome extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _prepareContext() {
     return {
+      ...await super._prepareContext(),
       journalUuid: "Compendium.timeline-builder.journal.JournalEntry.nmEPLrplwb6WaVdc"
     };
   }
 
   _onRender(context, options) {
+    super._onRender(context, options);
+
     const html = this.element;
-    
+
     // Action: Start & Never Show Again
     html.querySelector('[data-action="startSetup"]')?.addEventListener("click", () => {
       game.settings.set(MODULE_ID, "welcomeScreenShown", true);

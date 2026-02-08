@@ -5,8 +5,10 @@
 import { MODULE_ID, SETTINGS, TEMPLATES } from "./config.js";
 import { TimelineStore } from "./store.js";
 import { getGlassStyle, resolveEntryDisplayProps, resolvePageNames } from "./helpers.js";
+import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
+import { BaseCRUDForm } from "./forms/BaseCRUDForm.js";
 
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
+const { DialogV2 } = foundry.applications.api;
 
 const ICON_OPTIONS = {
   "fa-solid fa-skull": "Skull",
@@ -83,7 +85,7 @@ const ICON_OPTIONS = {
  * Timeline Manager Application for GMs.
  * Allows creating, editing, and managing timelines.
  */
-export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
+export class TimelineManager extends BaseHandlebarsForm {
   /** Currently selected timeline ID for editing */
   #selectedTimelineId = null;
 
@@ -140,9 +142,10 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * Prepare context data for rendering.
    */
   async _prepareContext(options) {
-    const timelines = TimelineStore.getTimelines();
+    const base = await super._prepareContext(options);
+    const timelines = this._getTimelines();
     const selectedTimeline = this.#selectedTimelineId
-      ? TimelineStore.getTimeline(this.#selectedTimelineId)
+      ? this._getTimeline(this.#selectedTimelineId)
       : null;
 
     if (selectedTimeline?.entries) {
@@ -160,6 +163,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     );
 
     return {
+      ...base,
       timelines,
       selectedTimeline,
       hasTimelines: timelines.length > 0,
@@ -171,39 +175,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * Setup event listeners after render.
    */
   _onRender(context, options) {
-    // Ensure the class is present to apply CSS variables
-    this.element.classList.add("timeline-builder");
-
-    // Inject Scrollbar Minimalista "Ghost" styles
-    if (!document.getElementById("timeline-ghost-scroll-styles")) {
-      const style = document.createElement("style");
-      style.id = "timeline-ghost-scroll-styles";
-      style.textContent = `
-        .timeline-builder *::-webkit-scrollbar {
-            width: 6px !important;
-            height: 6px !important;
-            background: transparent !important;
-        }
-        .timeline-builder *::-webkit-scrollbar-track {
-            background: transparent !important;
-            margin: 0 !important;
-        }
-        .timeline-builder *::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-radius: 10px !important;
-            border: none !important;
-            transition: background-color 0.3s;
-        }
-        .timeline-builder *::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 152, 0, 0.6) !important;
-        }
-        .timeline-builder * {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-        }
-      `;
-      document.head.appendChild(style);
-    }
+    super._onRender(context, options);
 
     // Convert period inputs to textareas for word wrapping
     this.element.querySelectorAll("input.entry-period").forEach(input => {
@@ -392,7 +364,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
         }
 
         if (!isValid) {
-          ui.notifications.warn(`Invalid format for '${mode}' mode. Expected: ${formatExample}`);
+          this._notifyWarning(`Invalid format for '${mode}' mode. Expected: ${formatExample}`);
           const entry = timeline.entries.find(e => e.id === entryId);
           input.value = entry ? entry.period : "";
           return;
@@ -1094,7 +1066,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onSaveTimeline(event, target) {
-    ui.notifications.info("Timeline saved successfully!");
+    this._notifyInfo("Timeline saved successfully!");
   }
 
   static async #onMoveEntryUp(event, target) {
@@ -1156,7 +1128,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const entry = timeline?.entries.find(e => e.id === entryId);
     
     if (!entry || !entry.img) {
-      ui.notifications.warn("This entry has no image to adjust.");
+      this._notifyWarning("This entry has no image to adjust.");
       return;
     }
 
@@ -1236,7 +1208,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const allTags = [...TimelineStore.getTags()].sort((a, b) => a.label.localeCompare(b.label));
 
     if (allTags.length === 0) {
-      ui.notifications.warn("No tags available. Create tags in the sidebar first.");
+      this._notifyWarning("No tags available. Create tags in the sidebar first.");
       return;
     }
 
@@ -1487,7 +1459,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     try {
       const doc = await fromUuid(entry.pageUuid);
-      if (!doc) return ui.notifications.warn("Linked page not found.");
+      if (!doc) return this._notifyWarning("Linked page not found.");
 
       // JournalEntry (full journal) — open normally
       if (doc.pages) return doc.sheet?.render(true);
@@ -1522,7 +1494,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       }).catch(() => {});
     } catch (err) {
       console.error("Timeline Builder | Error opening linked page:", err);
-      ui.notifications.error("Could not open the linked page.");
+      this._notifyError("Could not open the linked page.");
     }
   }
 
@@ -1541,66 +1513,41 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
 /**
  * Dedicated Application for managing global tags.
  */
-class TagManager extends ApplicationV2 {
+class TagManager extends BaseCRUDForm {
   static DEFAULT_OPTIONS = {
     id: "tag-manager",
-    classes: ["timeline-builder"],
-    window: { title: "Manage Global Tags", icon: "fa-solid fa-tags", width: 400 },
+    window: { title: "Manage Global Tags", icon: "fa-solid fa-tags" },
     position: { width: 400, height: "auto" }
   };
 
   async _renderHTML(context, options) {
-    const tags = [...TimelineStore.getTags()].sort((a, b) => a.label.localeCompare(b.label));
-    const colors = [...TimelineStore.getColors()].sort((a, b) => a.label.localeCompare(b.label));
-    const colorOptions = colors.map(c => `<option value="${c.value}">${c.label}</option>`).join("");
+    const tags = [...this._getTags()].sort((a, b) => a.label.localeCompare(b.label));
 
-    let html = `<div style="padding: 10px; background: #222; height: 100%;">      
-      <div class="tag-create-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
-        <input type="text" id="newTagLabel" placeholder="New Tag Name" maxlength="25" style="flex: 1; height: 32px;">
-        <select id="newTagColor" class="tl-combobox" style="max-width: 120px;">
-          ${colorOptions}
-        </select>
-        <button type="button" id="addTagBtn" style="width: 40px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-plus"></i></button>
-      </div>
-      <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid #333; border-radius: 4px; padding: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #ccc;">
-        <i class="fa-solid fa-circle-info" style="color: var(--tl-primary, #2ec4a0);"></i>
-        <span>Click on a tag to edit its name or color.</span>
-      </div>
-      <div class="tag-manager-list" style="display: flex; flex-wrap: wrap; gap: 5px; min-height: 50px; max-height: 300px; overflow-y: auto; align-content: flex-start;">`;
-    
-    tags.forEach(t => {
-      const style = getGlassStyle(t.color);
-      html += `
-        <div class="tag-chip" data-tag-id="${t.id}" style="${style} padding: 4px 8px; border-radius: 12px; display: flex; align-items: center; gap: 5px; font-size: 12px; cursor: pointer;" title="Click to edit">
-          <span style="font-weight: 600;">${t.label}</span>
-          <i class="fa-solid fa-times" data-action="delete-tag" data-tag-id="${t.id}" style="cursor: pointer; opacity: 0.8; margin-left: 4px;"></i>
-        </div>`;
-    });
-    
-    if (tags.length === 0) html += `<p style="color: #888; width: 100%; text-align: center; font-style: italic;">No tags created yet.</p>`;
-    
-    html += `</div></div>`;
-    
-    return html;
-  }
+    const chips = tags.length === 0
+      ? this._buildEmptyState("No tags created yet.")
+      : tags.map(t => this._buildChip({ id: t.id, label: t.label, color: t.color, dataAttr: "tag-id", deleteAction: "delete-tag" })).join("");
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = result;
+    return this._wrapContent(`
+      ${this._buildCreateRow({ inputId: "newTagLabel", buttonId: "addTagBtn", placeholder: "New Tag Name", colorId: "newTagColor" })}
+      ${this._buildInfoBanner("Click on a tag to edit its name or color.")}
+      ${this._buildChipList("tag-manager-list", chips)}
+    `);
   }
 
   _onRender(context, options) {
+    super._onRender(context, options);
+
     const addBtn = this.element.querySelector("#addTagBtn");
     if (addBtn) {
       addBtn.onclick = async () => {
         const label = this.element.querySelector("#newTagLabel").value.trim();
         const color = this.element.querySelector("#newTagColor").value;
         if (label) {
-          const tags = TimelineStore.getTags();
-          if (tags.some(t => t.label.toLowerCase() === label.toLowerCase())) {
-            ui.notifications.warn(`Tag "${label}" already exists.`);
+          if (this._getTags().some(t => t.label.toLowerCase() === label.toLowerCase())) {
+            this._notifyWarning(`Tag "${label}" already exists.`);
             return;
           }
-          await TimelineStore.createTag(label, color);
+          await this._store.createTag(label, color);
           this.render();
         }
       };
@@ -1612,7 +1559,7 @@ class TagManager extends ApplicationV2 {
         const target = e.target;
         if (target.dataset.action === "delete-tag") {
           e.stopPropagation();
-          await TimelineStore.deleteTag(e.target.dataset.tagId);
+          await this._store.deleteTag(e.target.dataset.tagId);
           this.render();
           return;
         }
@@ -1620,7 +1567,7 @@ class TagManager extends ApplicationV2 {
         const chip = target.closest(".tag-chip");
         if (chip) {
           const tagId = chip.dataset.tagId;
-          const tag = TimelineStore.getTags().find(t => t.id === tagId);
+          const tag = this._getTags().find(t => t.id === tagId);
           if (tag) this.#editTag(tag);
         }
       };
@@ -1628,38 +1575,34 @@ class TagManager extends ApplicationV2 {
   }
 
   async #editTag(tag) {
-    const colors = [...TimelineStore.getColors()].sort((a, b) => a.label.localeCompare(b.label));
-    const options = colors.map(c => 
+    const colors = [...this._getColors()].sort((a, b) => a.label.localeCompare(b.label));
+    const colorOpts = colors.map(c =>
       `<option value="${c.value}" ${c.value === tag.color ? "selected" : ""}>${c.label}</option>`
     ).join("");
 
     const content = `
       <div class="dialog-content" style="display: flex; gap: 5px; align-items: center;">
         <input type="text" name="label" value="${tag.label}" maxlength="25" style="flex: 1;" autofocus>
-        <select name="color" class="tl-combobox" style="max-width: 120px;">${options}</select>
+        <select name="color" class="tl-combobox" style="max-width: 120px;">${colorOpts}</select>
       </div>
     `;
 
-    await DialogV2.prompt({
-      classes: ["timeline-builder"],
-      window: { title: "Edit Tag", icon: "fa-solid fa-tag" },
-      content: content,
+    await this._promptDialog("Edit Tag", content, {
+      icon: "fa-solid fa-tag",
       ok: {
-        label: "Save",
         callback: async (event, button, dialog) => {
           const label = dialog.element.querySelector("input[name='label']").value.trim();
           const color = dialog.element.querySelector("select[name='color']").value;
 
           if (!label) return;
 
-          const tags = TimelineStore.getTags();
-          const duplicate = tags.find(t => t.id !== tag.id && t.label.toLowerCase() === label.toLowerCase());
+          const duplicate = this._getTags().find(t => t.id !== tag.id && t.label.toLowerCase() === label.toLowerCase());
           if (duplicate) {
-            ui.notifications.warn(`Tag "${label}" already exists.`);
+            this._notifyWarning(`Tag "${label}" already exists.`);
             return;
           }
 
-          await TimelineStore.updateTag(tag.id, { label, color });
+          await this._store.updateTag(tag.id, { label, color });
           this.render();
         }
       }
@@ -1670,7 +1613,7 @@ class TagManager extends ApplicationV2 {
 /**
  * Dedicated Application for managing user permissions.
  */
-class PermissionManager extends ApplicationV2 {
+class PermissionManager extends BaseCRUDForm {
   constructor(timelineId, options = {}) {
     super(options);
     this.timelineId = timelineId;
@@ -1678,13 +1621,12 @@ class PermissionManager extends ApplicationV2 {
 
   static DEFAULT_OPTIONS = {
     id: "permission-manager",
-    classes: ["timeline-builder"],
-    window: { title: "User Permissions", icon: "fa-solid fa-users-gear", width: 400 },
+    window: { title: "User Permissions", icon: "fa-solid fa-users-gear" },
     position: { width: 400, height: "auto" }
   };
 
   async _renderHTML(context, options) {
-    const timeline = TimelineStore.getTimeline(this.timelineId);
+    const timeline = this._getTimeline(this.timelineId);
     if (!timeline) return `<p>Timeline not found.</p>`;
 
     const users = game.users.filter(u => !u.isGM);
@@ -1700,7 +1642,7 @@ class PermissionManager extends ApplicationV2 {
           <div style="font-size: 0.8rem; color: #888;">Users inherit this unless overridden below.</div>
         </div>
       </div>
-      
+
       <div class="permission-list" style="display: flex; flex-direction: column; gap: 8px;">`;
 
     if (users.length === 0) {
@@ -1708,7 +1650,7 @@ class PermissionManager extends ApplicationV2 {
     }
 
     users.forEach(u => {
-      const perm = timeline.userPermissions?.[u.id]; // undefined (default), true, or false
+      const perm = timeline.userPermissions?.[u.id];
       const val = perm === undefined ? "default" : (perm ? "true" : "false");
 
       html += `
@@ -1732,14 +1674,14 @@ class PermissionManager extends ApplicationV2 {
   }
 
   _replaceHTML(result, content, options) {
-    content.innerHTML = result;
+    super._replaceHTML(result, content, options);
     content.querySelector("#savePermsBtn")?.addEventListener("click", async () => {
       const selects = content.querySelectorAll(".perm-select");
       const permissions = {};
       selects.forEach(s => {
         if (s.value !== "default") permissions[s.dataset.userId] = (s.value === "true");
       });
-      await TimelineStore.updateTimelinePermissions(this.timelineId, permissions);
+      await this._store.updateTimelinePermissions(this.timelineId, permissions);
       this.close();
     });
   }
@@ -1748,61 +1690,49 @@ class PermissionManager extends ApplicationV2 {
 /**
  * Dedicated Application for managing global colors.
  */
-class ColorManager extends ApplicationV2 {
+class ColorManager extends BaseCRUDForm {
   static DEFAULT_OPTIONS = {
     id: "color-manager",
-    classes: ["timeline-builder"],
-    window: { title: "Manage Global Colors", icon: "fa-solid fa-palette", width: 400 },
+    window: { title: "Manage Global Colors", icon: "fa-solid fa-palette" },
     position: { width: 400, height: "auto" }
   };
 
   async _renderHTML(context, options) {
-    const colors = [...TimelineStore.getColors()].sort((a, b) => a.label.localeCompare(b.label));
-    let html = `<div style="padding: 10px; background: #222; height: 100%;">      
-      <div class="color-create-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
+    const colors = [...this._getColors()].sort((a, b) => a.label.localeCompare(b.label));
+
+    const chips = colors.length === 0
+      ? this._buildEmptyState("No colors created yet.")
+      : colors.map(c => this._buildChip({ id: c.id, label: c.label, color: c.value, dataAttr: "color-id", deleteAction: "delete-color" })).join("");
+
+    // ColorManager uses a native <input type="color"> instead of a color select
+    const createRow = `
+      <div class="create-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
         <input type="text" id="newColorLabel" placeholder="New Color Name" maxlength="25" style="flex: 1; height: 32px;">
         <input type="color" id="newColorValue" value="#2ec4a0" style="width: 40px; height: 38px; padding: 0; border: none; cursor: pointer; background: none;">
         <button type="button" id="addColorBtn" style="width: 40px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-plus"></i></button>
-      </div>
-      <div style="background: rgba(0, 0, 0, 0.2); border: 1px solid #333; border-radius: 4px; padding: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #ccc;">
-        <i class="fa-solid fa-circle-info" style="color: var(--tl-primary, #2ec4a0);"></i>
-        <span>Click on a color to edit its name or value.</span>
-      </div>
-      <div class="color-manager-list" style="display: flex; flex-wrap: wrap; gap: 5px; min-height: 50px; max-height: 300px; overflow-y: auto; align-content: flex-start;">`;
-    
-    colors.forEach(c => {
-      const style = getGlassStyle(c.value);
-      html += `
-        <div class="color-chip" data-color-id="${c.id}" style="${style} padding: 4px 8px; border-radius: 12px; display: flex; align-items: center; gap: 5px; font-size: 12px; cursor: pointer;" title="Click to edit">
-          <span style="font-weight: 600;">${c.label}</span>
-          <i class="fa-solid fa-times" data-action="delete-color" data-color-id="${c.id}" style="cursor: pointer; opacity: 0.8; margin-left: 4px;"></i>
-        </div>`;
-    });
-    
-    if (colors.length === 0) html += `<p style="color: #888; width: 100%; text-align: center; font-style: italic;">No colors created yet.</p>`;
-    
-    html += `</div></div>`;
-    
-    return html;
-  }
+      </div>`;
 
-  _replaceHTML(result, content, options) {
-    content.innerHTML = result;
+    return this._wrapContent(`
+      ${createRow}
+      ${this._buildInfoBanner("Click on a color to edit its name or value.")}
+      ${this._buildChipList("color-manager-list", chips)}
+    `);
   }
 
   _onRender(context, options) {
+    super._onRender(context, options);
+
     const addBtn = this.element.querySelector("#addColorBtn");
     if (addBtn) {
       addBtn.onclick = async () => {
         const label = this.element.querySelector("#newColorLabel").value.trim();
         const value = this.element.querySelector("#newColorValue").value;
         if (label) {
-          const colors = TimelineStore.getColors();
-          if (colors.some(c => c.label.toLowerCase() === label.toLowerCase())) {
-            ui.notifications.warn(`Color "${label}" already exists.`);
+          if (this._getColors().some(c => c.label.toLowerCase() === label.toLowerCase())) {
+            this._notifyWarning(`Color "${label}" already exists.`);
             return;
           }
-          await TimelineStore.createColor(label, value);
+          await this._store.createColor(label, value);
           this.render();
         }
       };
@@ -1814,11 +1744,11 @@ class ColorManager extends ApplicationV2 {
         const target = e.target;
         if (target.dataset.action === "delete-color") {
           e.stopPropagation();
-          if ([...TimelineStore.getColors()].length <= 1) {
-            ui.notifications.warn("Cannot delete the last color. At least one color is required.");
+          if ([...this._getColors()].length <= 1) {
+            this._notifyWarning("Cannot delete the last color. At least one color is required.");
             return;
           }
-          await TimelineStore.deleteColor(e.target.dataset.colorId);
+          await this._store.deleteColor(e.target.dataset.colorId);
           this.render();
           return;
         }
@@ -1826,7 +1756,7 @@ class ColorManager extends ApplicationV2 {
         const chip = target.closest(".color-chip");
         if (chip) {
           const colorId = chip.dataset.colorId;
-          const color = TimelineStore.getColors().find(c => c.id === colorId);
+          const color = this._getColors().find(c => c.id === colorId);
           if (color) this.#editColor(color);
         }
       };
@@ -1841,26 +1771,22 @@ class ColorManager extends ApplicationV2 {
       </div>
     `;
 
-    await DialogV2.prompt({
-      classes: ["timeline-builder"],
-      window: { title: "Edit Color", icon: "fa-solid fa-palette" },
-      content: content,
+    await this._promptDialog("Edit Color", content, {
+      icon: "fa-solid fa-palette",
       ok: {
-        label: "Save",
         callback: async (event, button, dialog) => {
           const label = dialog.element.querySelector("input[name='label']").value.trim();
           const value = dialog.element.querySelector("input[name='value']").value;
 
           if (!label) return;
 
-          const colors = TimelineStore.getColors();
-          const duplicate = colors.find(c => c.id !== color.id && c.label.toLowerCase() === label.toLowerCase());
+          const duplicate = this._getColors().find(c => c.id !== color.id && c.label.toLowerCase() === label.toLowerCase());
           if (duplicate) {
-            ui.notifications.warn(`Color "${label}" already exists.`);
+            this._notifyWarning(`Color "${label}" already exists.`);
             return;
           }
 
-          await TimelineStore.updateColor(color.id, { label, value });
+          await this._store.updateColor(color.id, { label, value });
           this.render();
         }
       }
