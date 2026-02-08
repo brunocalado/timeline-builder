@@ -1,8 +1,6 @@
-2026/02/08-07:47:40.076 5b08 Recovering log #72
-2026/02/08-07:47:40.079 5b08 Delete type=0 #72
-2026/02/08-07:47:40.079 5b08 Delete type=3 #71
-2026/02/08-07:48:02.650 1a78 Level-0 table #76: started
-2026/02/08-07:48:02.650 1a78 Level-0 table #76: 0 bytes OK
-2026/02/08-07:48:02.651 1a78 Delete type=0 #74
-2026/02/08-07:48:02.653 1a78 Manual compaction at level-0 from '!journal!nmEPLrplwb6WaVdc' @ 72057594037927935 : 1 .. '!journal.pages!nmEPLrplwb6WaVdc.jv3upaYcDplYSzm0' @ 0 : 0; will stop at (end)
-2026/02/08-07:48:02.653 1a78 Manual compaction at level-1 from '!journal!nmEPLrplwb6WaVdc' @ 72057594037927935 : 1 .. '!journal.pages!nmEPLrplwb6WaVdc.jv3upaYcDplYSzm0' @ 0 : 0; will stop at (end)
+2026/02/08-07:54:04.637 2ae4 Log #87: 0 ops saved to Table #90 OK
+2026/02/08-07:54:04.638 2ae4 Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\timeline-builder\packs\journal/000087.log: OK
+2026/02/08-07:54:04.638 2ae4 Table #22: 2 entries OK
+2026/02/08-07:54:04.638 2ae4 Table #89: 2 entries OK
+2026/02/08-07:54:04.640 2ae4 Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\timeline-builder\packs\journal/MANIFEST-000085: OK
+2026/02/08-07:54:04.642 2ae4 **** Repaired leveldb C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\timeline-builder\packs\journal; recovered 2 files; 5896 bytes. Some data may have been lost. ****

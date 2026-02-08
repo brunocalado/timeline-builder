@@ -119,6 +119,50 @@
         color: #ffaaaa;
     }
 
+    /* --- ESTILO DO CARD TITLE ATUALIZADO (BORDA GROSSA) --- */
+    .card-title {
+        margin: 0 0 8px 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.2;
+        
+        /* A Mágica da Borda Grossa */
+        border-left: 5px solid var(--entry-color, #777);
+        padding: 4px 0 4px 10px; /* Espaço entre a borda e o texto */
+        
+        /* Opcional: Gradiente sutil para destacar o header */
+        background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+        
+        /* Opcional: O texto assume a cor da borda/evento */
+        color: var(--entry-color, #eee);
+    }
+
+    .card-title .hidden-icon {
+        opacity: 0.7;
+        font-size: 0.8em;
+        margin-right: 5px;
+        color: inherit; /* Herda a cor do titulo */
+    }
+
+    .card-page-link {
+        margin-left: 6px;
+        font-size: 0.8em;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        color: inherit;
+    }
+    .card-page-link:hover {
+        opacity: 1;
+    }
+
+    /* Ajuste para quando o texto é misterioso (redacted) */
+    .card-title.mystery-redacted {
+        border-left-color: #555; /* Borda cinza se for misterio total */
+        color: #777;
+        font-style: italic;
+    }
+
     /* External Image Positioning (Inverse Zig-Zag) */
     .h-entry {
         position: relative;
@@ -659,6 +703,7 @@
                {{#if this.pageUuid}}<span class="card-page-link" data-action="openLinkedPage" data-page-uuid="{{this.pageUuid}}" title="{{this.pageName}}"><i class="fa-solid fa-file-lines"></i></span>{{/if}}
             </h3>
 
+            <div class="card-body">
             {{#if this.description}}
             <p class="card-desc">{{this.description}}</p>
             {{/if}}
@@ -670,6 +715,7 @@
               {{/each}}
             </div>
             {{/if}}
+            </div>
             {{/if}}
 
           </div>

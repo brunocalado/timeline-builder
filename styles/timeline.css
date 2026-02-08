@@ -687,7 +687,7 @@
   background: #191919;
   border: 1px solid var(--tl-border);
   border-radius: 8px;
-  padding: 15px;
+  padding: 0;
   transition: transform 0.3s, border-color 0.3s;
   position: absolute;
   left: 0;
@@ -714,6 +714,10 @@
 .timeline-builder .h-entry:nth-child(even) .card-box {
   top: var(--tl-stem-height);
   bottom: auto;
+}
+
+.timeline-builder .card-body {
+  padding: 0 15px 15px 15px;
 }
 
 /* Date/Period Positioned near the dot */
