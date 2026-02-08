@@ -124,8 +124,6 @@ Hooks.once("ready", () => {
     module.api = TimelineAPI;
   }
 
-  console.log(`${MODULE_ID} | API available at: Timeline.Manage() and Timeline.Open()`);
-
   // Listen for broadcast setting changes to show timeline on all clients (except the GM who triggered it)
   Hooks.on("updateSetting", (setting) => {
     if (setting.key === `${MODULE_ID}.${SETTINGS.BROADCAST}`) {
