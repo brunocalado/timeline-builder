@@ -1,4 +1,4 @@
-<div class="timeline-viewer-container" {{#if selectedTimeline.backgroundImage}}style="background-image: url('{{selectedTimeline.backgroundImage}}'); background-size: cover; background-position: center;"{{/if}}>
+<div class="timeline-viewer-container" {{#if selectedTimeline.backgroundImage}}style="background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px), url('{{selectedTimeline.backgroundImage}}'); background-size: 20px 20px, cover; background-position: 0 0, center; background-color: #1a1a1a;"{{/if}}>
   <style>
     .timeline-viewer-container {
         position: absolute;
@@ -9,6 +9,12 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+
+        /* Dot grid background pattern */
+        background-color: #1a1a1a;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-position: 0 0;
     }
     /* Floating Filter Menu */
     .timeline-filter-menu {
@@ -264,6 +270,11 @@
     .timeline-scroll-area {
         flex: 1;
         overflow: auto;
+        /* Dot grid background pattern */
+        background-color: #1a1a1a;
+        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-position: 0 0;
     }
     .timeline-tabs {
         flex-shrink: 0;
@@ -666,7 +677,7 @@
   {{/if}}
 
   <!-- Horizontal Timeline Content -->
-  <div class="timeline-scroll-area" id="timelineScrollContainer" style="padding-top: 10px; padding-bottom: 10px; {{#if selectedTimeline.backgroundImage}}background: transparent;{{/if}}">
+  <div class="timeline-scroll-area" id="timelineScrollContainer" style="padding-top: 10px; padding-bottom: 10px; {{#if selectedTimeline.backgroundImage}}background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px), url('{{selectedTimeline.backgroundImage}}'); background-size: 20px 20px, cover; background-position: 0 0, center;{{/if}}">
     {{#if selectedTimeline}}
       {{#if selectedTimeline.entries.length}}
       <div class="timeline-track {{#if (eq selectedTimeline.lineStyle 'dashed')}}track-style-dashed{{/if}} {{#if (eq selectedTimeline.lineStyle 'rough')}}track-style-rough{{/if}} {{#if (eq selectedTimeline.lineEffect 'pulse')}}track-effect-pulse{{/if}} {{#if (eq selectedTimeline.lineEffect 'glitch')}}track-effect-glitch{{/if}} {{#if (eq selectedTimeline.lineEffect 'neon')}}track-effect-neon{{/if}} {{#if (eq selectedTimeline.lineEffect 'chroma')}}track-effect-chroma{{/if}} {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}}" style="margin-top: 0; margin-bottom: 0; {{#if selectedTimeline.lineWidth}}--tl-line-width: {{selectedTimeline.lineWidth}}px;{{/if}}{{#if selectedTimeline.lineColor}}--tl-line-color: {{selectedTimeline.lineColor}};{{/if}}{{#if selectedTimeline.dotSize}}--tl-dot-size: {{selectedTimeline.dotSize}}px;{{/if}}">

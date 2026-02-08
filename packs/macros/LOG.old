@@ -1,6 +1,7 @@
-2026/02/08-07:54:04.624 5b08 Log #86: 0 ops saved to Table #89 OK
-2026/02/08-07:54:04.625 5b08 Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\timeline-builder\packs\macros/000086.log: OK
-2026/02/08-07:54:04.625 5b08 Table #5: 5 entries OK
-2026/02/08-07:54:04.625 5b08 Table #88: 2 entries OK
-2026/02/08-07:54:04.627 5b08 Archiving C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\timeline-builder\packs\macros/MANIFEST-000084: OK
-2026/02/08-07:54:04.629 5b08 **** Repaired leveldb C:\Users\Bruno\Documents\VTT\fvttdev\Data\modules\timeline-builder\packs\macros; recovered 2 files; 1585 bytes. Some data may have been lost. ****
+2026/02/08-09:01:12.082 2630 Recovering log #96
+2026/02/08-09:01:12.085 2630 Delete type=0 #96
+2026/02/08-09:01:12.086 2630 Delete type=3 #95
+2026/02/08-09:01:23.753 4cbc Level-0 table #100: started
+2026/02/08-09:01:23.753 4cbc Level-0 table #100: 0 bytes OK
+2026/02/08-09:01:23.754 4cbc Delete type=0 #98
+2026/02/08-09:01:23.755 4cbc Manual compaction at level-0 from '!macros!O9cbeMAv0suuV624' @ 72057594037927935 : 1 .. '!macros!cicGj8jEKqjTo3cg' @ 0 : 0; will stop at (end)
