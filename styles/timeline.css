@@ -629,7 +629,8 @@
   top: 50%;
   transform: translateY(-50%);
   height: 2px;
-  background: var(--tl-border);
+  background: var(--tl-line-color, var(--tl-border));
+  height: var(--tl-line-width, 2px);
   z-index: 0;
 }
 
@@ -739,14 +740,6 @@
 
 .timeline-builder .h-entry:nth-child(odd) .entry-date { top: 20px; }
 .timeline-builder .h-entry:nth-child(even) .entry-date { bottom: 20px; }
-
-/* When image is present, move timeframe beyond the image (outer edge) */
-.timeline-builder .h-entry:nth-child(odd).has-image .entry-date {
-  top: calc(var(--img-offset) + 158px);
-}
-.timeline-builder .h-entry:nth-child(even).has-image .entry-date {
-  bottom: calc(var(--img-offset) + 158px);
-}
 
 /* --- Tags Positioning --- */
 .timeline-builder .h-entry > .card-tags {
@@ -1099,4 +1092,392 @@
     height: 3px;
     background-image: linear-gradient(to right, transparent, #ffd700, transparent);
     margin: 10px 0;
+}
+
+/* ===========================
+   MOVED FROM VIEWER.HBS
+   =========================== */
+
+.timeline-builder .timeline-viewer-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    /* Dot grid background pattern */
+    background-color: #1a1a1a;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0;
+}
+/* Floating Filter Menu */
+.timeline-builder .timeline-filter-menu {
+  position: absolute;
+  top: 70px; /* Lower down */
+  left: 0;   /* Docked to left */
+  z-index: 100;
+  opacity: 0.3; /* Semi-hidden */
+  transition: opacity 0.3s;
+}
+.timeline-builder .timeline-filter-menu:hover {
+  opacity: 1;
+}
+.timeline-builder .filter-icon-btn {
+  width: 40px;
+  height: 40px;
+  background: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: none;
+  border-radius: 0 8px 8px 0; /* Square-ish */
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+.timeline-builder .filter-icon-btn:hover {
+    background: rgba(50, 50, 50, 1);
+    color: #fff;
+}
+.timeline-builder .filter-icon-btn.active {
+    color: #fff;
+    border-color: #ff9800;
+    box-shadow: 4px 0 10px rgba(255, 152, 0, 0.3);
+    border-right: 2px solid #ff9800;
+}
+.timeline-builder .filter-dropdown {
+  position: absolute;
+  top: 0;
+  left: 100%; /* Opens to the right of the icon */
+  margin-left: 5px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  width: 250px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  max-height: 400px;
+  overflow-y: auto;
+  align-content: flex-start;
+
+  /* Animation and Delay to prevent quick disappearance */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px);
+  transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+  transition-delay: 0.3s; /* Delay to disappear */
+}
+.timeline-builder .timeline-filter-menu:hover .filter-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition-delay: 0s; /* Appears instantly */
+}
+.timeline-builder .filter-tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s, filter 0.2s;
+}
+.timeline-builder .filter-tag-chip.off {
+    opacity: 0.7;
+    filter: grayscale(0.3);
+}
+.timeline-builder .filter-tag-chip.off:hover {
+    opacity: 0.9;
+    filter: grayscale(0.1);
+}
+.timeline-builder .filter-tag-chip.on {
+    opacity: 1;
+    filter: none;
+}
+.timeline-builder .filter-clear-btn {
+    width: 100%;
+    margin-top: 4px;
+    background: rgba(255, 100, 100, 0.1);
+    color: #ff8888;
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    text-align: center;
+}
+.timeline-builder .filter-clear-btn:hover {
+    background: rgba(255, 100, 100, 0.2);
+    color: #ffaaaa;
+}
+
+/* --- ESTILO DO CARD TITLE ATUALIZADO (BORDA GROSSA) --- */
+.timeline-builder .card-title {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    
+    /* A Mágica da Borda Grossa */
+    border-left: 5px solid var(--entry-color, #777);
+    padding: 4px 0 4px 10px; /* Espaço entre a borda e o texto */
+    
+    /* Opcional: Gradiente sutil para destacar o header */
+    background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    
+    /* Opcional: O texto assume a cor da borda/evento */
+    color: var(--entry-color, #eee);
+}
+
+.timeline-builder .card-title .hidden-icon {
+    opacity: 0.7;
+    font-size: 0.8em;
+    margin-right: 5px;
+    color: inherit; /* Herda a cor do titulo */
+}
+
+.timeline-builder .card-page-link {
+    margin-left: 6px;
+    font-size: 0.8em;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    color: inherit;
+}
+.timeline-builder .card-page-link:hover {
+    opacity: 1;
+}
+
+/* Ajuste para quando o texto é misterioso (redacted) */
+.timeline-builder .card-title.mystery-redacted {
+    border-left-color: #555; /* Borda cinza se for misterio total */
+    color: #777;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Timeframe positioning - à direita da bolinha quando há imagem */
+.timeline-builder .h-entry.has-image .entry-date {
+    position: absolute;
+    left: calc(50% + var(--tl-dot-size, 16px) / 2 + 15px);
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    z-index: 2;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.4;
+    padding: 4px 8px;
+    height: auto !important;
+    min-height: fit-content;
+}
+
+/* Timeframe positioning - acima/abaixo da bolinha quando NÃO há imagem */
+.timeline-builder .h-entry:not(.has-image) .entry-date {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    white-space: nowrap;
+    display: inline-block;
+    line-height: 1.4;
+    padding: 4px 8px;
+    height: auto !important;
+    min-height: fit-content;
+}
+/* Entries ímpares (card em cima) -> timeframe abaixo da bolinha */
+.timeline-builder .h-entry:nth-child(odd):not(.has-image) .entry-date {
+    top: 50%;
+    margin-top: calc(var(--tl-dot-size, 16px) / 2 + 8px);
+}
+/* Entries pares (card embaixo) -> timeframe acima da bolinha */
+.timeline-builder .h-entry:nth-child(even):not(.has-image) .entry-date {
+    bottom: 50%;
+    margin-bottom: calc(var(--tl-dot-size, 16px) / 2 + 8px);
+}
+
+/* Espaçamento uniforme entre linha principal e bloco de texto */
+.timeline-builder .h-entry:nth-child(odd) .card-box {
+    margin-top: 30px;
+}
+.timeline-builder .h-entry:nth-child(even) .card-box {
+    margin-bottom: 30px;
+}
+
+/* External Image Positioning (Inverse Zig-Zag) */
+.timeline-builder .h-entry {
+    position: relative;
+    --img-offset: 30px;
+}
+.timeline-builder .h-entry.has-date { --img-offset: 30px; }
+.timeline-builder .h-entry.has-tags { --img-offset: 30px; }
+.timeline-builder .h-entry.has-date.has-tags { --img-offset: 30px; }
+/* When image present, date moves beyond image — offset no longer needs date space */
+.timeline-builder .h-entry.has-image.has-date { --img-offset: 30px; }
+.timeline-builder .h-entry.has-image.has-date.has-tags { --img-offset: 30px; }
+
+.timeline-builder .card-img-wrapper.detached {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 150px;
+    z-index: 1;
+}
+.timeline-builder .card-img-wrapper.detached .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    margin: 0;
+    display: block;
+}
+/* Animated corner frame */
+.timeline-builder .card-img-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    cursor: zoom-in;
+}
+.timeline-builder .card-img-frame::before,
+.timeline-builder .card-img-frame::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-style: solid;
+    border-color: var(--entry-color, var(--tl-text-muted));
+    transition: width 0.4s ease, height 0.4s ease, border-color 0.4s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+.timeline-builder .card-img-frame::before {
+    top: 0;
+    left: 0;
+    border-width: 2px 0 0 2px;
+    border-radius: 4px 0 0 0;
+}
+.timeline-builder .card-img-frame::after {
+    bottom: 0;
+    right: 0;
+    border-width: 0 2px 2px 0;
+    border-radius: 0 0 4px 0;
+}
+.timeline-builder .card-img-frame:hover::before,
+.timeline-builder .card-img-frame:hover::after {
+    width: 100%;
+    height: 100%;
+    border-color: var(--entry-color, var(--tl-primary));
+}
+.timeline-builder .card-img-frame:hover::before {
+    border-radius: 4px 0 0 4px;
+}
+.timeline-builder .card-img-frame:hover::after {
+    border-radius: 0 4px 4px 0;
+}
+/* Connector line from image to center point */
+.timeline-builder .card-img-wrapper.detached::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    border-left: var(--tl-line-width, 2px) solid var(--tl-line-color, var(--entry-color, var(--tl-text-muted)));
+}
+/* Odd (Block Top) -> Image Bottom */
+.timeline-builder .h-entry:nth-child(odd) .card-img-wrapper.detached {
+    top: var(--img-offset);
+}
+.timeline-builder .h-entry:nth-child(odd) .card-img-wrapper.detached::before {
+    bottom: 100%;
+    height: var(--img-offset);
+}
+/* Even (Block Bottom) -> Image Top */
+.timeline-builder .h-entry:nth-child(even) .card-img-wrapper.detached {
+    top: auto;
+    bottom: var(--img-offset);
+}
+.timeline-builder .h-entry:nth-child(even) .card-img-wrapper.detached::before {
+    top: 100%;
+    height: var(--img-offset);
+}
+
+/* Ensure scroll areas are scrollable */
+.timeline-builder .timeline-scroll-area {
+    flex: 1;
+    overflow: auto;
+    /* Dot grid background pattern */
+    background-color: #1a1a1a;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-builder .timeline-tabs {
+    flex-shrink: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Lightbox Overlay (Global) */
+.timeline-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    cursor: zoom-out;
+    animation: lightbox-fade-in 0.2s ease;
+}
+@keyframes lightbox-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.timeline-lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    cursor: default;
+}
+
+/* Refactored Inline Styles */
+.timeline-builder .entry-date {
+    color: #fff;
+    border: 1px solid var(--entry-color);
+    font-size: 14px;
+}
+
+.timeline-builder .card-box {
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.timeline-builder .hidden-icon.mystery-icon {
+    color: #a855f7;
+}
+
+.timeline-builder .entry-icon-display {
+    margin-right: 5px;
+    opacity: 0.8;
 }
