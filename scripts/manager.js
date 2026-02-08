@@ -788,9 +788,9 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
           <select name="defaultEffect" style="width: 100%; box-sizing: border-box;">${effectOptions}</select>
       </div>
       <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Background Image</label>
+          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Background Image / Video</label>
           <div style="display: flex; gap: 5px; align-items: center;">
-              <input type="text" name="backgroundImage" value="${timeline.backgroundImage || ""}" placeholder="path/to/image.webp" style="flex: 1;">
+              <input type="text" name="backgroundImage" value="${timeline.backgroundImage || ""}" placeholder="path/to/image.webp or video.webm" style="flex: 1;">
               <button type="button" data-action="pickImage" style="width: 32px; height: 26px; display: flex; align-items: center; justify-content: center; background: #444; border: 1px solid #666; color: #fff; cursor: pointer; border-radius: 3px;">
                   <i class="fa-solid fa-file-import"></i>
               </button>
@@ -834,7 +834,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
         pickImage: async (event, target) => {
             const input = target.closest(".form-group").querySelector("input[name=backgroundImage]");
             const fp = new foundry.applications.apps.FilePicker({
-                type: "image",
+                type: "imagevideo",
                 callback: (path) => { input.value = path; }
             });
             await fp.browse();

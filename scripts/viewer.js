@@ -200,9 +200,66 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
 
+    this.#setupBackground(context);
     this.#setupHorizontalScroll(container);
     this.#setupLightbox();
     this.#setupDragToScroll(container);
+  }
+
+  /**
+   * Setup custom background (Image or Video)
+   */
+  #setupBackground(context) {
+    const container = this.element.querySelector('.timeline-viewer-container');
+    const scrollArea = this.element.querySelector('.timeline-scroll-area');
+    if (!container) return;
+
+    // Remove existing background
+    const existing = container.querySelector('.custom-bg-media');
+    if (existing) existing.remove();
+
+    // Reset scroll area background
+    if (scrollArea) scrollArea.style.background = '';
+
+    const bgUrl = context.selectedTimeline?.backgroundImage;
+    if (!bgUrl) return;
+
+    const isVideo = /\.(mp4|webm|m4v)$/i.test(bgUrl);
+    let el;
+
+    if (isVideo) {
+      el = document.createElement('video');
+      el.autoplay = true;
+      el.muted = true;
+      el.loop = true;
+      el.playsInline = true;
+    } else {
+      el = document.createElement('img');
+    }
+
+    el.src = bgUrl;
+    el.classList.add('custom-bg-media');
+    
+    // Apply styles to cover container
+    Object.assign(el.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      zIndex: '0',
+      opacity: '0.5', // Slight transparency to ensure text readability
+      pointerEvents: 'none'
+    });
+
+    // Insert as first child
+    container.insertBefore(el, container.firstChild);
+
+    // Make scroll area transparent so background shows through
+    if (scrollArea) {
+      scrollArea.style.background = 'transparent';
+    }
   }
 
   /**
