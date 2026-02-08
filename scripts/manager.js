@@ -781,7 +781,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       <div class="tab-pane active" data-tab="general">
           <div class="form-group settings-field">
               <label>Timeframe Mode</label>
-              <select name="timeframeMode">${modeOptions}</select>
+              <select name="timeframeMode" class="tl-combobox">${modeOptions}</select>
           </div>
           <div class="form-group settings-field">
               <div class="checkbox-group">
@@ -806,11 +806,11 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
           <h3 class="settings-section-title">Default Entry Style</h3>
           <div class="form-group settings-field">
               <label>Color</label>
-              <select name="defaultColor">${colorOptions}</select>
+              <select name="defaultColor" class="tl-combobox">${colorOptions}</select>
           </div>
           <div class="form-group settings-field">
               <label>Effect</label>
-              <select name="defaultEffect">${effectOptions}</select>
+              <select name="defaultEffect" class="tl-combobox">${effectOptions}</select>
           </div>
       </div>`;
 
@@ -819,22 +819,22 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
           <h3 class="settings-section-title">Default Line Style</h3>
           <div class="form-group settings-field">
               <label>Width</label>
-              <select name="lineWidth">
+              <select name="lineWidth" class="tl-combobox">
                   <option value="1" ${(timeline.lineWidth || 2) == 1 ? "selected" : ""}>1 px</option>
                   <option value="2" ${(timeline.lineWidth || 2) == 2 ? "selected" : ""}>2 px</option>
               </select>
           </div>
           <div class="form-group settings-field">
               <label>Color</label>
-              <select name="lineColor">${lineColorOptions}</select>
+              <select name="lineColor" class="tl-combobox">${lineColorOptions}</select>
           </div>
           <div class="form-group settings-field">
               <label>Style</label>
-              <select name="lineStyle">${lineStyleOptions}</select>
+              <select name="lineStyle" class="tl-combobox">${lineStyleOptions}</select>
           </div>
           <div class="form-group settings-field">
               <label>Effect</label>
-              <select name="lineEffect">${lineEffectOptions}</select>
+              <select name="lineEffect" class="tl-combobox">${lineEffectOptions}</select>
           </div>
       </div>`;
 
@@ -842,11 +842,11 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       <div class="tab-pane" data-tab="dot">
           <div class="form-group settings-field">
               <label>Dot Size</label>
-              <select name="dotSize">${dotSizeOptions}</select>
+              <select name="dotSize" class="tl-combobox">${dotSizeOptions}</select>
           </div>
           <div class="form-group settings-field">
               <label>Dot Shape</label>
-              <select name="dotShape">${dotShapeOptions}</select>
+              <select name="dotShape" class="tl-combobox">${dotShapeOptions}</select>
           </div>
       </div>`;
 
@@ -1335,7 +1335,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const color = await DialogV2.prompt({
       classes: ["timeline-builder"],
       window: { title: "Choose Color" },
-      content: `<div class="form-group dialog-content"><label>Select Color:</label><select name="color" style="width: 100%; box-sizing: border-box;">${options}</select></div>`,
+      content: `<div class="form-group dialog-content"><label>Select Color:</label><select name="color" class="tl-combobox" style="width: 100%;">${options}</select></div>`,
       ok: {
         label: "Choose",
         callback: (event, button, dialog) => dialog.element.querySelector("select[name=color]").value
@@ -1389,11 +1389,11 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
         <div class="effect-dialog-content">
           <div class="form-group">
             <label>Select Effect:</label>
-            <select name="effect" style="width: 100%; box-sizing: border-box;" onchange="document.getElementById('effectColorGroup').style.display = ['glow','glow-strong','glitch'].includes(this.value) ? 'block' : 'none';">${effectOptions}</select>
+            <select name="effect" class="tl-combobox" style="width: 100%;" onchange="document.getElementById('effectColorGroup').style.display = ['glow','glow-strong','glitch'].includes(this.value) ? 'block' : 'none';">${effectOptions}</select>
           </div>
           <div class="form-group" id="effectColorGroup" style="display: ${showColor ? "block" : "none"};">
             <label>Effect Color:</label>
-            <select name="effectColor" style="width: 100%; box-sizing: border-box;">${colorOptions}</select>
+            <select name="effectColor" class="tl-combobox" style="width: 100%;">${colorOptions}</select>
           </div>
         </div>`,
       ok: {
@@ -1557,7 +1557,7 @@ class TagManager extends ApplicationV2 {
     let html = `<div style="padding: 10px; background: #222; height: 100%;">      
       <div class="tag-create-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
         <input type="text" id="newTagLabel" placeholder="New Tag Name" maxlength="25" style="flex: 1; height: 32px;">
-        <select id="newTagColor" style="height: 32px; max-width: 120px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">
+        <select id="newTagColor" class="tl-combobox" style="max-width: 120px;">
           ${colorOptions}
         </select>
         <button type="button" id="addTagBtn" style="width: 40px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-plus"></i></button>
@@ -1636,7 +1636,7 @@ class TagManager extends ApplicationV2 {
     const content = `
       <div class="dialog-content" style="display: flex; gap: 5px; align-items: center;">
         <input type="text" name="label" value="${tag.label}" maxlength="25" style="flex: 1;" autofocus>
-        <select name="color" style="height: 32px; max-width: 120px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">${options}</select>
+        <select name="color" class="tl-combobox" style="max-width: 120px;">${options}</select>
       </div>
     `;
 
@@ -1714,7 +1714,7 @@ class PermissionManager extends ApplicationV2 {
       html += `
         <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 4px;">
           <span style="font-weight: 600;">${u.name}</span>
-          <select class="perm-select" data-user-id="${u.id}" style="background: #222; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 2px;">
+          <select class="perm-select tl-combobox" data-user-id="${u.id}">
             <option value="default" ${val === "default" ? "selected" : ""}>Default (${globalState})</option>
             <option value="true" ${val === "true" ? "selected" : ""}>Force Visible</option>
             <option value="false" ${val === "false" ? "selected" : ""}>Force Hidden</option>

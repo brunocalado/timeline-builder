@@ -1592,22 +1592,9 @@
     gap: 5px;
     margin-bottom: 4px;
 }
+/* Entry icon combobox - uses .tl-combobox standard + specific overrides */
 .timeline-builder .timeline-manager-container .entry-icon {
     flex: 0 0 130px;
-    background: var(--tl-input-bg);
-    color: var(--tl-text-main);
-    border: 1px solid transparent;
-    padding: 0 5px;
-    height: 26px;
-}
-.timeline-builder .timeline-manager-container .entry-icon:focus {
-    border-color: var(--tl-primary, #2ec4a0);
-    background: rgba(0,0,0,0.6);
-    outline: none;
-}
-.timeline-builder .timeline-manager-container .entry-icon option {
-    background: #222;
-    color: #fff;
 }
 
 /* ===========================
@@ -1774,8 +1761,7 @@
     font-size: 0.85rem;
 }
 
-/* Match visual style of entry-icon */
-.timeline-builder .timeline-settings-container select,
+/* Settings container inputs */
 .timeline-builder .timeline-settings-container input[type="text"] {
     width: 100%;
     box-sizing: border-box;
@@ -1788,16 +1774,15 @@
     transition: border-color 0.2s;
 }
 
-.timeline-builder .timeline-settings-container select:focus,
 .timeline-builder .timeline-settings-container input[type="text"]:focus {
     border-color: var(--tl-primary, #2ec4a0);
     background: rgba(0,0,0,0.6);
     outline: none;
 }
 
-.timeline-builder .timeline-settings-container option {
-    background: #222;
-    color: #fff;
+/* Settings container selects use standard combobox + full width */
+.timeline-builder .timeline-settings-container .tl-combobox {
+    width: 100%;
 }
 
 .timeline-builder .checkbox-group label {
@@ -1982,4 +1967,50 @@
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+/* ===========================
+   Standard Combobox / Select
+   =========================== */
+.timeline-builder .tl-combobox {
+    height: 32px;
+    background: #27272a;
+    color: #d4d4d8;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 4px 8px;
+    padding-left: 11px;
+    box-sizing: border-box;
+    transition: all 0.1s ease-out;
+    cursor: pointer;
+}
+
+.timeline-builder .tl-combobox:hover {
+    background: #52525b;
+    color: #ffffff;
+    border-left: 4px solid #10b981;
+    padding-left: 12px;
+}
+
+.timeline-builder .tl-combobox:focus {
+    background: rgba(0,0,0,0.6);
+    color: #ffffff;
+    border-color: var(--tl-primary, #2ec4a0);
+    border-left: 4px solid #10b981;
+    outline: none;
+}
+
+.timeline-builder .tl-combobox option {
+    background: #27272a;
+    color: #d4d4d8;
+}
+
+.timeline-builder .tl-combobox option:checked {
+    background: #52525b linear-gradient(0deg, #52525b 0%, #52525b 100%);
+    color: #ffffff;
+}
+
+.timeline-builder .tl-combobox option:hover {
+    background: #52525b !important;
+    color: #ffffff !important;
 }
