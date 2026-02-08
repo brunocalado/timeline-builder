@@ -430,7 +430,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       const y = parts[2] || "";
 
       content = `
-        <div style="background: #222; padding: 10px; display: flex; gap: 5px; align-items: center; justify-content: center;">
+        <div class="timeframe-input-row">
             <input type="number" name="day" placeholder="DD" value="${d}" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
             <span style="font-weight: bold;">/</span>
             <input type="number" name="month" placeholder="MM" value="${m}" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
@@ -458,7 +458,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       const s = parts[2] || "";
 
       content = `
-        <div style="background: #222; padding: 10px; display: flex; gap: 5px; align-items: center; justify-content: center;">
+        <div class="timeframe-input-row">
             <input type="number" name="hour" placeholder="HH" value="${h}" min="0" max="23" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
             <span style="font-weight: bold;">:</span>
             <input type="number" name="min" placeholder="MM" value="${m}" min="0" max="59" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
@@ -485,7 +485,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       const m = parts[1] || "";
 
       content = `
-        <div style="background: #222; padding: 10px; display: flex; gap: 5px; align-items: center; justify-content: center;">
+        <div class="timeframe-input-row">
             <input type="number" name="hour" placeholder="HH" value="${h}" min="0" max="23" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
             <span style="font-weight: bold;">:</span>
             <input type="number" name="min" placeholder="MM" value="${m}" min="0" max="59" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
@@ -508,7 +508,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       const y = parts[1] || "";
 
       content = `
-        <div style="background: #222; padding: 10px; display: flex; gap: 5px; align-items: center; justify-content: center;">
+        <div class="timeframe-input-row">
             <input type="number" name="month" placeholder="MM" value="${m}" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
             <span style="font-weight: bold;">/</span>
             <input type="number" name="year" placeholder="YYYY" value="${y}" oninput="if(this.value.length>6)this.value=this.value.slice(0,6);" style="width: 80px; text-align: center;">
@@ -540,7 +540,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       const mm = tParts[1] || "";
 
       content = `
-        <div style="background: #222; padding: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center;">
+        <div class="timeframe-input-col">
             <div style="display: flex; gap: 5px; align-items: center;">
                 <input type="number" name="day" placeholder="DD" value="${d}" oninput="if(this.value.length>3)this.value=this.value.slice(0,3);" style="width: 50px; text-align: center;">
                 <span>/</span>
@@ -647,7 +647,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const result = await DialogV2.prompt({
       classes: ["timeline-builder"],
       window: { title: "New Timeline" },
-      content: `<div style="background: #222; padding: 10px;"><input type="text" name="name" placeholder="Timeline name" maxlength="25" autofocus style="width: 100%; box-sizing: border-box;"></div>`,
+      content: `<div class="dialog-content"><input type="text" name="name" placeholder="Timeline name" maxlength="25" autofocus style="width: 100%; box-sizing: border-box;"></div>`,
       ok: {
         label: "Create",
         callback: (event, button, dialog) => dialog.element.querySelector("input[name=name]").value.trim()
@@ -763,73 +763,116 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       `<option value="${s.value}" ${s.value === (timeline.dotShape || "default") ? "selected" : ""}>${s.label}</option>`
     ).join("");
 
+    const container = document.createElement("div");
     const wrapper = document.createElement("div");
-    const content = document.createElement("div");
-    content.style.cssText = "background: #222; padding: 10px; display: flex; flex-direction: column; gap: 10px;";
-    wrapper.appendChild(content);
-    content.innerHTML = `
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Timeframe Mode</label>
-          <select name="timeframeMode" style="width: 100%; box-sizing: border-box;">${modeOptions}</select>
-      </div>
-      <div class="form-group">
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="checkbox" name="autoSort" ${timeline.autoSort ? "checked" : ""}>
-              <span>Auto Sort</span>
-          </label>
-          <p style="color: #aaa; margin: 5px 0 0 24px;">Automatically sort entries when the timeframe is updated.</p>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Default Entry Color</label>
-          <select name="defaultColor" style="width: 100%; box-sizing: border-box;">${colorOptions}</select>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Default Entry Effect</label>
-          <select name="defaultEffect" style="width: 100%; box-sizing: border-box;">${effectOptions}</select>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Background Image / Video</label>
-          <div style="display: flex; gap: 5px; align-items: center;">
-              <input type="text" name="backgroundImage" value="${timeline.backgroundImage || ""}" placeholder="path/to/image.webp or video.webm" style="flex: 1;">
-              <button type="button" data-action="pickImage" style="width: 32px; height: 26px; display: flex; align-items: center; justify-content: center; background: #444; border: 1px solid #666; color: #fff; cursor: pointer; border-radius: 3px;">
-                  <i class="fa-solid fa-file-import"></i>
-              </button>
+    wrapper.classList.add("timeline-settings-container");
+    container.appendChild(wrapper);
+
+    const tabsHtml = `
+      <nav class="settings-tabs">
+        <div class="settings-tab active" data-tab="general"><i class="fa-solid fa-sliders"></i> General</div>
+        <div class="settings-tab" data-tab="entry"><i class="fa-solid fa-file-lines"></i> Entry</div>
+        <div class="settings-tab" data-tab="line"><i class="fa-solid fa-bezier-curve"></i> Line</div>
+        <div class="settings-tab" data-tab="dot"><i class="fa-solid fa-circle-dot"></i> Dot</div>
+      </nav>
+    `;
+
+    const generalHtml = `
+      <div class="tab-pane active" data-tab="general">
+          <div class="form-group settings-field">
+              <label>Timeframe Mode</label>
+              <select name="timeframeMode">${modeOptions}</select>
           </div>
-      </div>
-      <hr style="border: none; border-top: 1px solid #444; margin: 5px 0;">
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Main Line Width</label>
-          <select name="lineWidth" style="width: 100%; box-sizing: border-box;">
-              <option value="1" ${(timeline.lineWidth || 2) == 1 ? "selected" : ""}>1 px</option>
-              <option value="2" ${(timeline.lineWidth || 2) == 2 ? "selected" : ""}>2 px</option>
-          </select>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Main Line Color</label>
-          <select name="lineColor" style="width: 100%; box-sizing: border-box;">${lineColorOptions}</select>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Main Line Style</label>
-          <select name="lineStyle" style="width: 100%; box-sizing: border-box;">${lineStyleOptions}</select>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Main Line Effect</label>
-          <select name="lineEffect" style="width: 100%; box-sizing: border-box;">${lineEffectOptions}</select>
-      </div>
-      <hr style="border: none; border-top: 1px solid #444; margin: 5px 0;">
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Dot Size</label>
-          <select name="dotSize" style="width: 100%; box-sizing: border-box;">${dotSizeOptions}</select>
-      </div>
-      <div class="form-group">
-          <label style="display: block; margin-bottom: 4px; white-space: nowrap;">Dot Shape</label>
-          <select name="dotShape" style="width: 100%; box-sizing: border-box;">${dotShapeOptions}</select>
+          <div class="form-group settings-field">
+              <div class="checkbox-group">
+                  <input type="checkbox" id="chkAutoSort" name="autoSort" ${timeline.autoSort ? "checked" : ""}>
+                  <label for="chkAutoSort">Auto Sort</label>
+              </div>
+              <p class="hint">Automatically sort entries when the timeframe is updated.</p>
+          </div>
+          <div class="form-group settings-field">
+              <label>Background Image / Video</label>
+              <div class="input-group">
+                  <input type="text" name="backgroundImage" value="${timeline.backgroundImage || ""}" placeholder="path/to/image.webp or video.webm">
+                  <button type="button" class="input-group-btn" data-action="pickImage">
+                      <i class="fa-solid fa-file-import"></i>
+                  </button>
+              </div>
+          </div>
       </div>`;
+
+    const entryHtml = `
+      <div class="tab-pane" data-tab="entry">
+          <h3 class="settings-section-title">Default Entry Style</h3>
+          <div class="form-group settings-field">
+              <label>Color</label>
+              <select name="defaultColor">${colorOptions}</select>
+          </div>
+          <div class="form-group settings-field">
+              <label>Effect</label>
+              <select name="defaultEffect">${effectOptions}</select>
+          </div>
+      </div>`;
+
+    const lineHtml = `
+      <div class="tab-pane" data-tab="line">
+          <h3 class="settings-section-title">Default Line Style</h3>
+          <div class="form-group settings-field">
+              <label>Width</label>
+              <select name="lineWidth">
+                  <option value="1" ${(timeline.lineWidth || 2) == 1 ? "selected" : ""}>1 px</option>
+                  <option value="2" ${(timeline.lineWidth || 2) == 2 ? "selected" : ""}>2 px</option>
+              </select>
+          </div>
+          <div class="form-group settings-field">
+              <label>Color</label>
+              <select name="lineColor">${lineColorOptions}</select>
+          </div>
+          <div class="form-group settings-field">
+              <label>Style</label>
+              <select name="lineStyle">${lineStyleOptions}</select>
+          </div>
+          <div class="form-group settings-field">
+              <label>Effect</label>
+              <select name="lineEffect">${lineEffectOptions}</select>
+          </div>
+      </div>`;
+
+    const dotHtml = `
+      <div class="tab-pane" data-tab="dot">
+          <div class="form-group settings-field">
+              <label>Dot Size</label>
+              <select name="dotSize">${dotSizeOptions}</select>
+          </div>
+          <div class="form-group settings-field">
+              <label>Dot Shape</label>
+              <select name="dotShape">${dotShapeOptions}</select>
+          </div>
+      </div>`;
+
+    wrapper.innerHTML = tabsHtml + `<div class="settings-content">${generalHtml}${entryHtml}${lineHtml}${dotHtml}</div>`;
 
     const result = await DialogV2.prompt({
       classes: ["timeline-builder"],
       window: { title: `Settings: ${timeline.name}`, icon: "fa-solid fa-gear" },
-      content: wrapper,
+      content: container,
+      render: (event) => {
+        // Attach tab listeners inside render to ensure elements exist in DOM
+        const html = event.target.element;
+        const tabs = html.querySelectorAll(".settings-tab");
+        const panes = html.querySelectorAll(".tab-pane");
+        
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                panes.forEach(p => p.classList.remove("active"));
+                
+                tab.classList.add("active");
+                const tabId = tab.dataset.tab;
+                html.querySelector(`.tab-pane[data-tab="${tabId}"]`)?.classList.add("active");
+            });
+        });
+      },
       actions: {
         pickImage: async (event, target) => {
             const input = target.closest(".form-group").querySelector("input[name=backgroundImage]");
@@ -958,7 +1001,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const confirmed = await DialogV2.confirm({
       classes: ["timeline-builder"],
       window: { title: "Sort Timeline" },
-      content: `<div style="background: #222; padding: 10px;">
+      content: `<div class="dialog-content">
         <p>Are you sure you want to sort all entries in "<strong>${timeline.name}</strong>"?</p>
         <p>Sorting is based on the current Timeframe Mode (<strong>${timeline.timeframeMode || "free"}</strong>).</p>
         <p style="color: #ff6b6b; margin-top: 10px;"><i class="fa-solid fa-triangle-exclamation"></i> This action cannot be undone.</p>
@@ -981,7 +1024,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const confirmed = await DialogV2.confirm({
       classes: ["timeline-builder"],
       window: { title: "Delete Timeline" },
-      content: `<div style="background: #222; padding: 10px;"><p>Are you sure you want to delete "<strong>${timeline.name}</strong>"?</p>
+      content: `<div class="dialog-content"><p>Are you sure you want to delete "<strong>${timeline.name}</strong>"?</p>
                 <p>This action cannot be undone.</p></div>`,
       yes: { label: "Delete", icon: "fa-solid fa-trash" },
       no: { label: "Cancel" }
@@ -1025,7 +1068,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const confirmed = await DialogV2.confirm({
       classes: ["timeline-builder"],
       window: { title: "Delete Entry" },
-      content: `<div style="background: #222; padding: 10px;"><p>Are you sure you want to delete this entry?</p></div>`,
+      content: `<div class="dialog-content"><p>Are you sure you want to delete this entry?</p></div>`,
       yes: { label: "Delete", icon: "fa-solid fa-trash" },
       no: { label: "Cancel" }
     });
@@ -1122,27 +1165,27 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // HTML content for the dialog
     const content = `
-      <div style="background: #111; padding: 10px; text-align: center;">
+      <div class="dialog-content-centered">
         <p style="color: #ccc; font-size: 12px; margin-bottom: 8px;">Click on the point of interest in the image.</p>
-        <div class="focus-picker-container" style="position: relative; display: inline-block; cursor: crosshair; max-width: 100%; border: 1px solid #444;">
-          <img src="${entry.img}" style="display: block; max-width: 100%; max-height: 400px; pointer-events: none;">
+        <div class="focus-picker-container">
+          <img src="${entry.img}">
           <div class="focus-point" style="
-              position: absolute; 
-              left: ${currentX}%; 
-              top: ${currentY}%; 
-              width: 20px; 
-              height: 20px; 
-              border: 2px solid #ff0000; 
-              border-radius: 50%; 
-              transform: translate(-50%, -50%); 
+              position: absolute;
+              left: ${currentX}%;
+              top: ${currentY}%;
+              width: 20px;
+              height: 20px;
+              border: 2px solid #ff0000;
+              border-radius: 50%;
+              transform: translate(-50%, -50%);
               box-shadow: 0 0 4px rgba(0,0,0,0.8);
               pointer-events: none;
               background: rgba(255, 255, 255, 0.3);">
           </div>
           <!-- Invisible overlay to capture clicks -->
-          <div class="click-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+          <div class="click-overlay"></div>
         </div>
-        <div style="margin-top: 8px; font-family: monospace; color: #888;">
+        <div class="focus-picker-info">
           X: <span id="focus-x">${currentX}</span>% | Y: <span id="focus-y">${currentY}</span>%
         </div>
       </div>`;
@@ -1204,7 +1247,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     const buildSelectedHtml = (selectedIds) => {
       const selected = allTags.filter(t => selectedIds.has(t.id));
-      if (selected.length === 0) return `<p style="color: #666; font-style: italic; margin: 0; font-size: 12px;">No tags selected.</p>`;
+      if (selected.length === 0) return `<p class="empty-state-text">No tags selected.</p>`;
       return selected.map(t =>
         `<span class="pick-tag-chip selected" data-tag-id="${t.id}" style="${chipStyle(t)}" title="Click to remove">
           <span>${t.label}</span>
@@ -1215,7 +1258,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     const buildAvailableHtml = (selectedIds) => {
       const available = allTags.filter(t => !selectedIds.has(t.id));
-      if (available.length === 0) return `<p style="color: #666; font-style: italic; margin: 0; font-size: 12px;">All tags selected.</p>`;
+      if (available.length === 0) return `<p class="empty-state-text">All tags selected.</p>`;
       return available.map(t =>
         `<span class="pick-tag-chip available" data-tag-id="${t.id}" style="${chipStyle(t)}" title="Click to add">
           <span>${t.label}</span>
@@ -1224,13 +1267,13 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       ).join("");
     };
 
-    let content = `<div style="padding: 10px; background: #222;">
-      <label style="font-size: 11px; text-transform: uppercase; color: #aaa; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Selected Tags</label>
-      <div class="pick-tags-selected" style="display: flex; flex-wrap: wrap; gap: 5px; min-height: 30px; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid #333; border-radius: 4px; margin-bottom: 12px; align-content: flex-start;">
+    let content = `<div class="dialog-content">
+      <label class="tags-picker-label">Selected Tags</label>
+      <div class="pick-tags-selected tags-container selected">
         ${buildSelectedHtml(currentTags)}
       </div>
-      <label style="font-size: 11px; text-transform: uppercase; color: #aaa; letter-spacing: 0.5px; margin-bottom: 6px; display: block;">Available Tags</label>
-      <div class="pick-tags-available" style="display: flex; flex-wrap: wrap; gap: 5px; min-height: 30px; max-height: 200px; overflow-y: auto; padding: 8px; background: rgba(0,0,0,0.2); border: 1px solid #333; border-radius: 4px; align-content: flex-start;">
+      <label class="tags-picker-label">Available Tags</label>
+      <div class="pick-tags-available tags-container scrollable">
         ${buildAvailableHtml(currentTags)}
       </div>
     </div>`;
@@ -1292,7 +1335,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const color = await DialogV2.prompt({
       classes: ["timeline-builder"],
       window: { title: "Choose Color" },
-      content: `<div class="form-group" style="background: #222; padding: 10px;"><label>Select Color:</label><select name="color" style="width: 100%; box-sizing: border-box;">${options}</select></div>`,
+      content: `<div class="form-group dialog-content"><label>Select Color:</label><select name="color" style="width: 100%; box-sizing: border-box;">${options}</select></div>`,
       ok: {
         label: "Choose",
         callback: (event, button, dialog) => dialog.element.querySelector("select[name=color]").value
@@ -1343,7 +1386,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       classes: ["timeline-builder"],
       window: { title: "Choose Visual Effect" },
       content: `
-        <div style="background: #222; padding: 10px; display: flex; flex-direction: column; gap: 10px;">
+        <div class="effect-dialog-content">
           <div class="form-group">
             <label>Select Effect:</label>
             <select name="effect" style="width: 100%; box-sizing: border-box;" onchange="document.getElementById('effectColorGroup').style.display = ['glow','glow-strong','glitch'].includes(this.value) ? 'block' : 'none';">${effectOptions}</select>
@@ -1384,22 +1427,22 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       classes: ["timeline-builder"],
       window: { title: "Mystery Mode", icon: "fa-solid fa-mask" },
       content: `
-        <div style="background: #222; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
-          <p style="color: #a855f7; margin: 0; font-size: 0.85rem;">
+        <div class="mystery-dialog-content">
+          <p class="mystery-dialog-info">
             <i class="fa-solid fa-mask"></i>
             Mystery mode hides selected content from players while showing that something exists.
           </p>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <label class="mystery-checkbox-label">
             <input type="checkbox" name="mysteryImg" ${mystery.img ? "checked" : ""}>
             <i class="fa-solid fa-image" style="width: 16px; color: #3b9fd6;"></i>
             <span>Image</span>
           </label>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <label class="mystery-checkbox-label">
             <input type="checkbox" name="mysteryText" ${mystery.text ? "checked" : ""}>
             <i class="fa-solid fa-font" style="width: 16px; color: #e0a526;"></i>
             <span>Text <small style="color: #888;">(name, description & tags)</small></span>
           </label>
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <label class="mystery-checkbox-label">
             <input type="checkbox" name="mysteryTimeframe" ${mystery.timeframe ? "checked" : ""}>
             <i class="fa-solid fa-clock" style="width: 16px; color: #2ec4a0;"></i>
             <span>Timeframe</span>
@@ -1591,7 +1634,7 @@ class TagManager extends ApplicationV2 {
     ).join("");
 
     const content = `
-      <div style="display: flex; gap: 5px; align-items: center; padding: 10px; background: #222;">
+      <div class="dialog-content" style="display: flex; gap: 5px; align-items: center;">
         <input type="text" name="label" value="${tag.label}" maxlength="25" style="flex: 1;" autofocus>
         <select name="color" style="height: 32px; max-width: 120px; background: #222; color: #fff; border: 1px solid #444; border-radius: 4px;">${options}</select>
       </div>
@@ -1792,7 +1835,7 @@ class ColorManager extends ApplicationV2 {
 
   async #editColor(color) {
     const content = `
-      <div style="display: flex; gap: 5px; align-items: center; padding: 10px; background: #222;">
+      <div class="dialog-content" style="display: flex; gap: 5px; align-items: center;">
         <input type="text" name="label" value="${color.label}" maxlength="25" style="flex: 1;" autofocus>
         <input type="color" name="value" value="${color.value}" style="width: 40px; height: 38px; padding: 0; border: none; cursor: pointer; background: none;">
       </div>

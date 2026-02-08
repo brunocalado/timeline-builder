@@ -1609,3 +1609,377 @@
     background: #222;
     color: #fff;
 }
+
+/* ===========================
+   SETTINGS DIALOG
+   =========================== */
+
+/* Reset Foundry's standard-form gap that conflicts with our design */
+.timeline-builder .standard-form {
+    gap: 0 !important;
+}
+
+.timeline-builder .timeline-settings-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--tl-panel);
+    color: var(--tl-text);
+    min-height: 400px;
+}
+
+/* Section titles within settings */
+.timeline-builder .settings-section-title {
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    color: #ccc;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Individual field container with modern card style */
+.timeline-builder .settings-field {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--tl-border);
+    border-radius: 6px;
+    padding: 12px;
+    transition: border-color 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-builder .settings-field:hover {
+    border-color: var(--tl-border-hover);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Checkbox within settings field */
+.timeline-builder .settings-field .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.timeline-builder .settings-field .checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--tl-primary);
+}
+
+.timeline-builder .settings-field .checkbox-group label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Hint text within settings field */
+.timeline-builder .settings-field .hint {
+    color: var(--tl-text-muted);
+    font-size: 0.75rem;
+    font-style: italic;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Label within settings field */
+.timeline-builder .settings-field label:not(.mystery-checkbox-label):not([for="chkAutoSort"]) {
+    display: block !important;
+    margin-bottom: 8px;
+    color: var(--tl-text);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Input group within settings field */
+.timeline-builder .settings-field .input-group {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    width: 100%;
+}
+
+.timeline-builder .settings-field .input-group input {
+    flex: 1;
+}
+
+.timeline-builder .settings-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--tl-border);
+    flex-shrink: 0;
+}
+
+.timeline-builder .settings-tab {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: var(--tl-text-muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.timeline-builder .settings-tab:hover {
+    color: var(--tl-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.timeline-builder .settings-tab.active {
+    color: var(--tl-primary);
+    border-bottom-color: var(--tl-primary);
+    background: rgba(46, 196, 160, 0.05);
+}
+
+.timeline-builder .settings-content {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.timeline-builder .tab-pane {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    animation: fade-in 0.2s ease;
+}
+
+.timeline-builder .tab-pane.active {
+    display: flex;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.timeline-builder .form-group {
+    margin-bottom: 10px;
+}
+
+.timeline-builder .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--tl-text);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Match visual style of entry-icon */
+.timeline-builder .timeline-settings-container select,
+.timeline-builder .timeline-settings-container input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--tl-input-bg);
+    border: 1px solid var(--tl-border);
+    color: var(--tl-text-main);
+    padding: 4px 8px;
+    height: 32px;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+.timeline-builder .timeline-settings-container select:focus,
+.timeline-builder .timeline-settings-container input[type="text"]:focus {
+    border-color: var(--tl-primary, #2ec4a0);
+    background: rgba(0,0,0,0.6);
+    outline: none;
+}
+
+.timeline-builder .timeline-settings-container option {
+    background: #222;
+    color: #fff;
+}
+
+.timeline-builder .checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.timeline-builder .checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--tl-primary);
+    cursor: pointer;
+}
+
+.timeline-builder .hint {
+    color: var(--tl-text-muted);
+    margin: 4px 0 0 26px;
+    font-size: 0.8rem;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.timeline-builder .input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.timeline-builder .input-group input {
+    flex: 1;
+}
+
+.timeline-builder .input-group-btn {
+    width: 36px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #333;
+    border: 1px solid var(--tl-border);
+    color: var(--tl-text);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.timeline-builder .input-group-btn:hover {
+    background: #444;
+    border-color: var(--tl-border-hover);
+    color: #fff;
+}
+
+/* ===========================
+   DIALOG COMMON STYLES
+   =========================== */
+
+/* Standard dialog content wrapper */
+.timeline-builder .dialog-content {
+    background: #222;
+}
+
+.timeline-builder .dialog-content-centered {
+    background: #111;
+    text-align: center;
+}
+
+/* Timeframe editor layouts */
+.timeline-builder .timeframe-input-row {
+    background: #222;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-builder .timeframe-input-col {
+    background: #222;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tags picker labels */
+.timeline-builder .tags-picker-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #aaa;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Tags container areas */
+.timeline-builder .tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-height: 30px;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid #333;
+    border-radius: 4px;
+    align-content: flex-start;
+}
+
+.timeline-builder .tags-container.scrollable {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.timeline-builder .tags-container.selected {
+    margin-bottom: 12px;
+}
+
+/* Empty state text */
+.timeline-builder .empty-state-text {
+    color: #666;
+    font-style: italic;
+    margin: 0;
+    font-size: 12px;
+}
+
+/* Mystery mode dialog */
+.timeline-builder .mystery-dialog-content {
+    background: #222;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-builder .mystery-dialog-info {
+    color: #a855f7;
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.timeline-builder .mystery-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* Effect picker dialog */
+.timeline-builder .effect-dialog-content {
+    background: #222;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Focus picker */
+.timeline-builder .focus-picker-container {
+    position: relative;
+    display: inline-block;
+    cursor: crosshair;
+    max-width: 100%;
+    border: 1px solid #444;
+}
+
+.timeline-builder .focus-picker-container img {
+    display: block;
+    max-width: 100%;
+    max-height: 400px;
+    pointer-events: none;
+}
+
+.timeline-builder .focus-picker-info {
+    margin-top: 8px;
+    font-family: monospace;
+    color: #888;
+}
+
+.timeline-builder .click-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
