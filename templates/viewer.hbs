@@ -21,32 +21,50 @@
   </nav>
 
   <!-- Tag Filters (Left Floating Menu) -->
-  {{#if allTags.length}}
   <div class="timeline-filter-menu">
-    <!-- Round Icon -->
-    <div class="filter-icon-btn {{#if hasActiveFilters}}active{{/if}}">
-      <i class="fa-solid fa-filter"></i>
-    </div>
     
-    <!-- Dropdown List (Appears on Hover) -->
-    <div class="filter-dropdown">
-      {{#each allTags}}
-      <span class="filter-tag-chip {{#if this.active}}on{{else}}off{{/if}}"
-            style="{{this.glassStyle}}"
-            data-action="toggleTagFilter"
-            data-tag-id="{{this.id}}">
-        {{this.label}}
-      </span>
-      {{/each}}
+    {{#if allTags.length}}
+    <div class="filter-group">
+      <!-- Round Icon -->
+      <div class="filter-icon-btn {{#if hasActiveFilters}}active{{/if}}">
+        <i class="fa-solid fa-filter"></i>
+      </div>
+      
+      <!-- Dropdown List (Appears on Hover) -->
+      <div class="filter-dropdown">
+        {{#each allTags}}
+        <span class="filter-tag-chip {{#if this.active}}on{{else}}off{{/if}}"
+              style="{{this.glassStyle}}"
+              data-action="toggleTagFilter"
+              data-tag-id="{{this.id}}">
+          {{this.label}}
+        </span>
+        {{/each}}
 
-      {{#if hasActiveFilters}}
-      <button type="button" class="filter-clear-btn" data-action="clearFilters">
-        <i class="fa-solid fa-times"></i> Clear Filters
-      </button>
-      {{/if}}
+        {{#if hasActiveFilters}}
+        <button type="button" class="filter-clear-btn" data-action="clearFilters">
+          <i class="fa-solid fa-times"></i> Clear Filters
+        </button>
+        {{/if}}
+      </div>
+    </div>
+    {{/if}}
+
+    <!-- Text Filter (Timeframe) -->
+    <div class="filter-group">
+      <div class="filter-icon-btn {{#if textFilter}}active{{/if}}">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <div class="filter-dropdown">
+        <div class="search-wrapper">
+          <input type="text" class="filter-search-input" 
+                 placeholder="Filter by timeframe..." 
+                 value="{{textFilter}}">
+          <i class="fa-solid fa-times search-clear-btn" style="{{#unless textFilter}}display:none;{{/unless}}"></i>
+        </div>
+      </div>
     </div>
   </div>
-  {{/if}}
 
   <!-- Horizontal Timeline Content -->
   <div class="timeline-scroll-area" id="timelineScrollContainer" style="{{#if selectedTimeline.backgroundImage}}background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px), url('{{selectedTimeline.backgroundImage}}'); background-size: 20px 20px, cover; background-position: 0 0, center;{{/if}}">
@@ -59,8 +77,10 @@
 
         {{#each selectedTimeline.entries}}
         <!-- Entry Block -->
-        <div class="h-entry {{#if this.hidden}}hidden-entry{{/if}} {{#if this.hasMystery}}mystery-entry{{/if}} {{#if this.displayEffect}}effect-{{this.displayEffect}}{{/if}}"
-             style="{{#if this.displayColor}}--entry-color: {{this.displayColor}};{{/if}}{{#if this.displayEffectColor}}--effect-color: {{this.displayEffectColor}};{{/if}}">
+        <div class="h-entry {{#if this.hidden}}hidden-entry{{/if}} {{#if this.hasMystery}}mystery-entry{{/if}} {{#if this.displayEffect}}effect-{{this.displayEffect}}{{/if}} {{#if this.isFilteredOut}}filtered-out{{/if}}"
+             style="{{#if this.displayColor}}--entry-color: {{this.displayColor}};{{/if}}{{#if this.displayEffectColor}}--effect-color: {{this.displayEffectColor}};{{/if}}"
+             data-period="{{this.period}}"
+             data-tag-ids="{{this.tagIds}}">
 
           {{!-- Timeframe --}}
           {{#if this.mysteryTimeframe}}

@@ -1122,6 +1122,9 @@
   z-index: 100;
   opacity: 0.3; /* Semi-hidden */
   transition: opacity 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .timeline-builder .timeline-filter-menu:hover {
   opacity: 1;
@@ -1176,7 +1179,11 @@
   transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
   transition-delay: 0.3s; /* Delay to disappear */
 }
-.timeline-builder .timeline-filter-menu:hover .filter-dropdown {
+
+.timeline-builder .filter-group {
+    position: relative;
+}
+.timeline-builder .filter-group:hover .filter-dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
@@ -1221,6 +1228,42 @@
 .timeline-builder .filter-clear-btn:hover {
     background: rgba(255, 100, 100, 0.2);
     color: #ffaaaa;
+}
+
+.timeline-builder .filter-search-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.timeline-builder .filter-search-input:focus {
+    outline: none;
+    border-color: var(--tl-primary);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.timeline-builder .search-wrapper {
+    position: relative;
+    width: 100%;
+}
+.timeline-builder .search-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    cursor: pointer;
+    font-size: 12px;
+}
+.timeline-builder .search-clear-btn:hover {
+    color: #fff;
+}
+
+.timeline-builder .filtered-out {
+    display: none !important;
 }
 
 /* --- ESTILO DO CARD TITLE ATUALIZADO (BORDA GROSSA) --- */

@@ -17,6 +17,8 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
   #selectedTimelineId = null;
   /** Active tag filters */
   #activeFilters = new Set();
+  /** Active text filter (timeframe) */
+  #textFilter = "";
 
   constructor(options) {
     super(options);
@@ -102,16 +104,15 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
       .map(t => ({ ...t, active: this.#activeFilters.has(t.id), glassStyle: getGlassStyle(t.color) }))
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    // 4. Filter entries by Active Tags
-    if (this.#activeFilters.size > 0) {
-        entries = entries.filter(e => {
-          const entryTagIds = e.tagIds || [];
-          return entryTagIds.some(id => this.#activeFilters.has(id));
-        });
-      }
+    // 4. Mark entries as filtered (instead of removing them) so DOM has all nodes
+    entries.forEach(e => {
+      const matchesTags = this.#activeFilters.size === 0 || (e.tagIds || []).some(id => this.#activeFilters.has(id));
+      const matchesText = !this.#textFilter || (e.period && e.period.toLowerCase().includes(this.#textFilter.toLowerCase()));
+      e.isFilteredOut = !matchesTags || !matchesText;
+    });
 
-      // 5. Hydrate tags and resolve display properties
-      entries.forEach(e => {
+    // 6. Hydrate tags and resolve display properties
+    entries.forEach(e => {
         e.tags = (e.tagIds || []).map(id => {
           const t = tagMap.get(id);
           if (!t) return null;
@@ -154,6 +155,7 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
       isGM,
       allTags,
       hasActiveFilters: this.#activeFilters.size > 0,
+      textFilter: this.#textFilter,
       userAvatar: game.user.avatar
     };
   }
@@ -174,9 +176,58 @@ export class TimelineViewer extends HandlebarsApplicationMixin(ApplicationV2) {
       if (img) entry.classList.add("has-image");
     });
 
+    // Setup Live Text Filter
+    const searchInput = this.element.querySelector('.filter-search-input');
+    const clearBtn = this.element.querySelector('.search-clear-btn');
+    
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.#textFilter = e.target.value;
+        if (clearBtn) clearBtn.style.display = this.#textFilter ? "block" : "none";
+        this.#applyFilters();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.#textFilter = "";
+        if (searchInput) {
+          searchInput.value = "";
+          searchInput.focus();
+        }
+        clearBtn.style.display = "none";
+        this.#applyFilters();
+      });
+    }
+
     this.#setupHorizontalScroll(container);
     this.#setupLightbox();
     this.#setupDragToScroll(container);
+  }
+
+  /**
+   * Apply filters directly to DOM elements to avoid re-rendering and losing focus.
+   */
+  #applyFilters() {
+    const entries = this.element.querySelectorAll('.h-entry');
+    const term = this.#textFilter.toLowerCase();
+    const activeTags = this.#activeFilters;
+
+    entries.forEach(entry => {
+      const period = (entry.dataset.period || "").toLowerCase();
+      // Handle tagIds which might be "id1,id2" string from handlebars
+      const tagIdsStr = entry.dataset.tagIds || "";
+      const tagIds = tagIdsStr ? tagIdsStr.split(",") : [];
+
+      const matchesText = !term || period.includes(term);
+      const matchesTags = activeTags.size === 0 || tagIds.some(id => activeTags.has(id));
+
+      if (matchesText && matchesTags) {
+        entry.classList.remove('filtered-out');
+      } else {
+        entry.classList.add('filtered-out');
+      }
+    });
   }
 
   /**
