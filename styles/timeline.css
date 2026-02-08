@@ -1481,3 +1481,88 @@
     margin-right: 5px;
     opacity: 0.8;
 }
+
+/* ===========================
+   MOVED FROM MANAGER.HBS
+   High Contrast & Readability
+   =========================== */
+
+.timeline-builder .timeline-manager-container {
+    --tl-bg-dark: #111111;
+    --tl-bg-panel: #1a1a1a;
+    --tl-bg-card: #222222;
+    --tl-text-main: #f0f0f0;
+    --tl-text-muted: #aaaaaa;
+    --tl-border: #444444;
+    --tl-input-bg: rgba(0, 0, 0, 0.4);
+    
+    color: var(--tl-text-main);
+    background-color: var(--tl-bg-panel);
+}
+
+.timeline-builder .timeline-manager-container .timeline-sidebar {
+    background-color: var(--tl-bg-dark);
+    border-right: 1px solid var(--tl-border);
+}
+
+.timeline-builder .timeline-manager-container .timeline-item {
+    color: var(--tl-text-muted);
+}
+.timeline-builder .timeline-manager-container .timeline-item:hover {
+    color: var(--tl-text-main);
+    background: rgba(255,255,255,0.05);
+}
+.timeline-builder .timeline-manager-container .timeline-item.selected {
+    color: #fff;
+    background: #123915;
+    font-weight: 600;
+}
+
+.timeline-builder .timeline-manager-container .timeline-entry {
+    background-color: var(--tl-bg-card);
+    border: 1px solid var(--tl-border);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.timeline-builder .timeline-manager-container input[type="text"], 
+.timeline-builder .timeline-manager-container textarea {
+    color: var(--tl-text-main) !important;
+    background: var(--tl-input-bg);
+    border: 1px solid transparent;
+}
+.timeline-builder .timeline-manager-container input[type="text"]:focus, 
+.timeline-builder .timeline-manager-container textarea:focus {
+    border-color: var(--tl-primary, #2ec4a0);
+    background: rgba(0,0,0,0.6);
+}
+
+.timeline-builder .timeline-manager-container .entry-description {
+    color: var(--tl-text-muted) !important;
+}
+
+.timeline-builder .timeline-manager-container ::placeholder {
+    color: #666 !important;
+}
+
+.timeline-builder .timeline-manager-container .entry-header-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 4px;
+}
+.timeline-builder .timeline-manager-container .entry-icon {
+    flex: 0 0 130px;
+    background: var(--tl-input-bg);
+    color: var(--tl-text-main);
+    border: 1px solid transparent;
+    padding: 0 5px;
+    height: 26px;
+}
+.timeline-builder .timeline-manager-container .entry-icon:focus {
+    border-color: var(--tl-primary, #2ec4a0);
+    background: rgba(0,0,0,0.6);
+    outline: none;
+}
+.timeline-builder .timeline-manager-container .entry-icon option {
+    background: #222;
+    color: #fff;
+}
