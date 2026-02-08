@@ -699,7 +699,7 @@
 .timeline-builder .card-box::-webkit-scrollbar { width: 5px; height: 5px; }
 
 .timeline-builder .card-box:hover {
-  border-color: var(--tl-primary);
+  border-color: var(--entry-color, var(--tl-primary));
   transform: scale(1.02);
   z-index: 10;
   background: #202020;
