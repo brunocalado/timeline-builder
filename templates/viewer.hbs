@@ -169,17 +169,64 @@
         font-style: italic;
     }
 
+    /* Timeframe positioning - à direita da bolinha quando há imagem */
+    .h-entry.has-image .entry-date {
+        position: absolute;
+        left: calc(50% + var(--tl-dot-size, 16px) / 2 + 15px);
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        white-space: nowrap;
+        display: inline-block;
+        line-height: 1.4;
+        padding: 4px 8px;
+        height: auto !important;
+        min-height: fit-content;
+    }
+
+    /* Timeframe positioning - acima/abaixo da bolinha quando NÃO há imagem */
+    .h-entry:not(.has-image) .entry-date {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        white-space: nowrap;
+        display: inline-block;
+        line-height: 1.4;
+        padding: 4px 8px;
+        height: auto !important;
+        min-height: fit-content;
+    }
+    /* Entries ímpares (card em cima) -> timeframe abaixo da bolinha */
+    .h-entry:nth-child(odd):not(.has-image) .entry-date {
+        top: 50%;
+        margin-top: calc(var(--tl-dot-size, 16px) / 2 + 8px);
+    }
+    /* Entries pares (card embaixo) -> timeframe acima da bolinha */
+    .h-entry:nth-child(even):not(.has-image) .entry-date {
+        bottom: 50%;
+        margin-bottom: calc(var(--tl-dot-size, 16px) / 2 + 8px);
+    }
+
+    /* Espaçamento uniforme entre linha principal e bloco de texto */
+    .h-entry:nth-child(odd) .card-box {
+        margin-top: 30px;
+    }
+    .h-entry:nth-child(even) .card-box {
+        margin-bottom: 30px;
+    }
+
     /* External Image Positioning (Inverse Zig-Zag) */
     .h-entry {
         position: relative;
-        --img-offset: 15px;
+        --img-offset: 30px;
     }
-    .h-entry.has-date { --img-offset: 48px; }
-    .h-entry.has-tags { --img-offset: 45px; }
-    .h-entry.has-date.has-tags { --img-offset: 80px; }
+    .h-entry.has-date { --img-offset: 30px; }
+    .h-entry.has-tags { --img-offset: 30px; }
+    .h-entry.has-date.has-tags { --img-offset: 30px; }
     /* When image present, date moves beyond image — offset no longer needs date space */
-    .h-entry.has-image.has-date { --img-offset: 15px; }
-    .h-entry.has-image.has-date.has-tags { --img-offset: 45px; }
+    .h-entry.has-image.has-date { --img-offset: 30px; }
+    .h-entry.has-image.has-date.has-tags { --img-offset: 30px; }
 
     .card-img-wrapper.detached {
         position: absolute;
