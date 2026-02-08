@@ -55,6 +55,29 @@
     ::placeholder {
         color: #666 !important;
     }
+
+    .entry-header-row {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 4px;
+    }
+    .entry-icon {
+        flex: 0 0 130px;
+        background: var(--tl-input-bg);
+        color: var(--tl-text-main);
+        border: 1px solid transparent;
+        padding: 0 5px;
+        height: 26px;
+    }
+    .entry-icon:focus {
+        border-color: var(--tl-primary, #2ec4a0);
+        background: rgba(0,0,0,0.6);
+        outline: none;
+    }
+    .entry-icon option {
+        background: #222;
+        color: #fff;
+    }
   </style>
   
   <!-- SIDEBAR: Timeline List -->
@@ -157,7 +180,12 @@
 
           <!-- COLUMN 2: Content -->
           <div class="entry-col-content">
-            <input type="text" class="entry-name" value="{{this.name}}" placeholder="Event Title">
+            <div class="entry-header-row">
+                <select class="entry-icon">
+                    {{selectOptions ../iconOptions selected=this.icon blank="None"}}
+                </select>
+                <input type="text" class="entry-name" value="{{this.name}}" placeholder="Event Title" style="flex: 1;">
+            </div>
             <textarea class="entry-description" placeholder="Description..." rows="1" maxlength="2000">{{this.description}}</textarea>
             
             <!-- Action Chips (Appear on Hover) -->

@@ -8,6 +8,77 @@ import { getGlassStyle, resolveEntryDisplayProps, resolvePageNames } from "./hel
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
+const ICON_OPTIONS = {
+  "fa-solid fa-skull": "Skull",
+  "fa-solid fa-skull-crossbones": "Skull Crossbones",
+  "fa-solid fa-shield-halved": "Shield Halved",
+  "fa-solid fa-dungeon": "Dungeon",
+  "fa-solid fa-hammer": "Hammer",
+  "fa-solid fa-gavel": "Gavel",
+  "fa-solid fa-bomb": "Bomb",
+  "fa-solid fa-explosion": "Explosion",
+  "fa-solid fa-hat-wizard": "Hat Wizard",
+  "fa-solid fa-wand-magic-sparkles": "Wand Magic Sparkles",
+  "fa-solid fa-scroll": "Scroll",
+  "fa-solid fa-book-skull": "Book Skull",
+  "fa-solid fa-dragon": "Dragon",
+  "fa-solid fa-ring": "Ring",
+  "fa-solid fa-flask": "Flask",
+  "fa-solid fa-ghost": "Ghost",
+  "fa-solid fa-fire": "Fire",
+  "fa-solid fa-droplet": "Droplet",
+  "fa-solid fa-wind": "Wind",
+  "fa-solid fa-mountain": "Mountain",
+  "fa-solid fa-tree": "Tree",
+  "fa-solid fa-leaf": "Leaf",
+  "fa-solid fa-sun": "Sun",
+  "fa-solid fa-moon": "Moon",
+  "fa-solid fa-crown": "Crown",
+  "fa-solid fa-landmark": "Landmark",
+  "fa-solid fa-coins": "Coins",
+  "fa-solid fa-gem": "Gem",
+  "fa-solid fa-key": "Key",
+  "fa-solid fa-map": "Map",
+  "fa-solid fa-compass": "Compass",
+  "fa-solid fa-anchor": "Anchor",
+  "fa-solid fa-dice-d20": "Dice D20",
+  "fa-solid fa-users": "Users",
+  "fa-solid fa-lock": "Lock",
+  "fa-solid fa-feather-pointed": "Feather Pointed",
+  "fa-solid fa-book-open": "Book Open",
+  "fa-solid fa-hourglass-half": "Hourglass Half",
+  "fa-solid fa-beer-mug-empty": "Beer Mug",
+  "fa-solid fa-bed": "Bed",
+  "fa-solid fa-store": "Store",
+  "fa-solid fa-tower-observation": "Tower",
+  "fa-solid fa-campground": "Campground",
+  "fa-solid fa-signs-post": "Sign Post",
+  "fa-solid fa-horse": "Horse",
+  "fa-solid fa-ship": "Ship",
+  "fa-solid fa-spider": "Spider",
+  "fa-solid fa-paw": "Paw",
+  "fa-solid fa-crow": "Crow",
+  "fa-solid fa-bug": "Bug",
+  "fa-solid fa-fish-fins": "Fish",
+  "fa-solid fa-person-falling": "Falling Person",
+  "fa-solid fa-biohazard": "Biohazard",
+  "fa-solid fa-virus": "Virus",
+  "fa-solid fa-comments": "Comments",
+  "fa-solid fa-handshake": "Handshake",
+  "fa-solid fa-puzzle-piece": "Puzzle Piece",
+  "fa-solid fa-bullseye": "Bullseye",
+  "fa-solid fa-flag": "Flag",
+  "fa-solid fa-envelope-open-text": "Letter",
+  "fa-solid fa-scale-balanced": "Scales",
+  "fa-solid fa-sack-dollar": "Sack of Money",
+  "fa-solid fa-box-open": "Open Box",
+  "fa-solid fa-trophy": "Trophy",
+  "fa-solid fa-heart-crack": "Broken Heart",
+  "fa-solid fa-staff-snake": "Staff Snake",
+  "fa-solid fa-guitar": "Guitar",
+  "fa-solid fa-wrench": "Wrench"
+};
+
 /**
  * Timeline Manager Application for GMs.
  * Allows creating, editing, and managing timelines.
@@ -84,10 +155,15 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
       await resolvePageNames(selectedTimeline.entries);
     }
 
+    const sortedIcons = Object.fromEntries(
+      Object.entries(ICON_OPTIONS).sort(([, a], [, b]) => a.localeCompare(b))
+    );
+
     return {
       timelines,
       selectedTimeline,
-      hasTimelines: timelines.length > 0
+      hasTimelines: timelines.length > 0,
+      iconOptions: sortedIcons
     };
   }
 
@@ -221,7 +297,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
    * Setup input listeners for entry editing.
    */
   #setupInputListeners() {
-    const inputs = this.element.querySelectorAll(".entry-name, .entry-description");
+    const inputs = this.element.querySelectorAll(".entry-name, .entry-description, .entry-icon");
     inputs.forEach(input => {
       input.addEventListener("change", this.#onEntryInputChange.bind(this));
     });
@@ -270,6 +346,7 @@ export class TimelineManager extends HandlebarsApplicationMixin(ApplicationV2) {
 
     let field;
     if (input.classList.contains("entry-name")) field = "name";
+    else if (input.classList.contains("entry-icon")) field = "icon";
     else if (input.classList.contains("entry-period")) field = "period";
     else field = "description";
 
