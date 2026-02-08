@@ -1665,7 +1665,7 @@ class PermissionManager extends BaseCRUDForm {
     });
 
     html += `</div>
-      <button type="button" id="savePermsBtn" style="margin-top: 15px; width: 100%; padding: 6px; background: var(--tl-primary); color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+      <button type="button" id="savePermsBtn" class="tl-action-btn" style="margin-top: 15px; width: 100%;">
         <i class="fa-solid fa-save"></i> Save Permissions
       </button>
     </div>`;
@@ -1709,7 +1709,7 @@ class ColorManager extends BaseCRUDForm {
       <div class="create-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
         <input type="text" id="newColorLabel" placeholder="New Color Name" maxlength="25" style="flex: 1; height: 32px;">
         <input type="color" id="newColorValue" value="#2ec4a0" style="width: 40px; height: 38px; padding: 0; border: none; cursor: pointer; background: none;">
-        <button type="button" id="addColorBtn" style="width: 40px; height: 32px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-plus"></i></button>
+        <button type="button" id="addColorBtn" class="tl-action-btn" style="width: 40px; height: 32px;"><i class="fa-solid fa-plus"></i></button>
       </div>`;
 
     return this._wrapContent(`

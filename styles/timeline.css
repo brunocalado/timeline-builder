@@ -1845,6 +1845,11 @@
 /* Standard dialog content wrapper */
 .timeline-builder .dialog-content {
     background: #222;
+    padding: 12px;
+}
+/* Settings has its own internal padding via .settings-content */
+.timeline-builder .dialog-content:has(.timeline-settings-container) {
+    padding: 0;
 }
 
 .timeline-builder .dialog-content-centered {
@@ -1877,7 +1882,11 @@
     color: #aaa;
     letter-spacing: 0.5px;
     margin-bottom: 6px;
+    padding-left: 2px;
     display: block;
+}
+.timeline-builder .tags-picker-label + .tags-container + .tags-picker-label {
+    margin-top: 10px;
 }
 
 /* Tags container areas */
@@ -1916,6 +1925,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding: 12px;
 }
 
 .timeline-builder .mystery-dialog-info {
@@ -1937,6 +1947,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 12px;
 }
 
 /* Focus picker */
@@ -2013,4 +2024,34 @@
 .timeline-builder .tl-combobox option:hover {
     background: #52525b !important;
     color: #ffffff !important;
+}
+
+/* ===========================
+   Unified Action Button
+   Covers ALL dialog buttons (DialogV2)
+   and custom CRUD form buttons.
+   =========================== */
+.timeline-builder .form-footer button,
+.timeline-builder .tl-action-btn {
+    background-color: #27272a;
+    border: 1px solid #3f3f46;
+    color: #9ca3af;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.timeline-builder .form-footer button:hover,
+.timeline-builder .tl-action-btn:hover {
+    background-color: #52525b;
+    border-color: #ffffff;
+    color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }

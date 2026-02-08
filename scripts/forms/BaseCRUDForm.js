@@ -78,7 +78,7 @@ export class BaseCRUDForm extends BaseTimelineForm {
       <div class="create-row" style="display: flex; gap: 5px; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333;">
         <input type="text" id="${inputId}" placeholder="${placeholder}" maxlength="25" style="flex: 1; height: 32px;">
         ${colorSelect}
-        <button type="button" id="${buttonId}" style="width: 40px; height: 32px; display: flex; align-items: center; justify-content: center;">
+        <button type="button" id="${buttonId}" class="tl-action-btn" style="width: 40px; height: 32px;">
           <i class="fa-solid fa-plus"></i>
         </button>
       </div>`;
