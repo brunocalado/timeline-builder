@@ -9,7 +9,7 @@
 		"thumbnail": "modules/timeline-builder/assets/images/thumbnail.webp"
 	}],   
 
-  "version": "0.0.2",
+  "version": "0.0.3",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
