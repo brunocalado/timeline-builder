@@ -794,6 +794,7 @@ export class TimelineManager extends BaseHandlebarsForm {
               <select name="lineWidth" class="tl-combobox">
                   <option value="1" ${(timeline.lineWidth || 2) == 1 ? "selected" : ""}>1 px</option>
                   <option value="2" ${(timeline.lineWidth || 2) == 2 ? "selected" : ""}>2 px</option>
+                  <option value="3" ${(timeline.lineWidth || 2) == 3 ? "selected" : ""}>3 px</option>
               </select>
           </div>
           <div class="form-group settings-field settings-row">

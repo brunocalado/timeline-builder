@@ -781,6 +781,7 @@
   width: var(--tl-line-width, 2px);
   background: var(--tl-line-color, var(--tl-border));
   height: var(--tl-stem-height);
+  z-index: -1;
 }
 
 .timeline-builder .h-entry:nth-child(odd)::after { bottom: 0; top: auto; }
@@ -1562,6 +1563,7 @@
     position: absolute;
     left: 50%;
     border-left: var(--tl-line-width, 2px) solid var(--tl-line-color, var(--entry-color, var(--tl-text-muted)));
+    z-index: -1;
 }
 /* Odd (Block Top) -> Image Bottom */
 .timeline-builder .h-entry:nth-child(odd) .card-img-wrapper.detached {
