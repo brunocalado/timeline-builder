@@ -708,15 +708,35 @@
   animation: timeline-builder-line-pulse 2s ease-in-out infinite;
 }
 
-/* Glitch: jitter displacement */
-@keyframes timeline-builder-line-glitch {
-  0%, 90%, 100% { transform: translateY(-50%); filter: none; }
-  91% { transform: translate(-2px, calc(-50% + 1px)); filter: hue-rotate(90deg); }
-  92% { transform: translate(1px, calc(-50% - 1px)); filter: none; }
-  93% { transform: translate(-1px, calc(-50% + 2px)); filter: invert(0.2); }
+/* Glitch: jitter + chromatic aberration + flicker */
+@keyframes timeline-builder-glitch {
+  0%, 10%, 38%, 52%, 80%, 95%, 100% {
+    translate: 0 0;
+    opacity: 1;
+    filter: none;
+    box-shadow: none;
+  }
+  /* Burst 1 */
+  2%  { translate: 4px -2px; box-shadow: -3px 0 0 0 rgba(255,0,0,.7), 3px 0 0 0 rgba(0,255,255,.7); }
+  4%  { translate: -3px 1px; filter: hue-rotate(90deg); }
+  6%  { translate: 1px -3px; box-shadow: 2px 0 0 0 rgba(255,0,0,.5), -2px 0 0 0 rgba(0,255,255,.5); }
+  8%  { opacity: 0; }
+  /* Burst 2 */
+  42% { translate: -4px 2px; box-shadow: -2px 0 0 0 rgba(255,0,0,.6), 2px 0 0 0 rgba(0,255,255,.6); filter: hue-rotate(180deg); }
+  44% { translate: 2px -1px; }
+  46% { translate: -1px 2px; opacity: .3; }
+  48% { opacity: 0; }
+  /* Burst 3 */
+  84% { translate: 3px -2px; box-shadow: 3px 0 0 0 rgba(255,0,0,.7), -3px 0 0 0 rgba(0,255,255,.7); }
+  86% { translate: -2px 1px; filter: hue-rotate(270deg); opacity: .6; }
+  88% { translate: 1px -1px; }
 }
 .timeline-builder .track-line.line-effect-glitch {
-  animation: timeline-builder-line-glitch 4s infinite;
+  animation: timeline-builder-glitch 4s infinite;
+}
+.timeline-builder .track-effect-glitch .h-entry::after,
+.timeline-builder .track-effect-glitch .card-img-wrapper.detached::before {
+  animation: timeline-builder-glitch 4s infinite;
 }
 
 /* Neon Flicker */
@@ -739,6 +759,13 @@
     0 0 4px var(--tl-line-color, var(--tl-border)),
     0 0 10px var(--tl-line-color, var(--tl-border));
 }
+.timeline-builder .track-effect-neon .h-entry::after,
+.timeline-builder .track-effect-neon .card-img-wrapper.detached::before {
+  animation: timeline-builder-line-neon 3s infinite;
+  box-shadow:
+    0 0 4px var(--tl-line-color, var(--tl-border)),
+    0 0 10px var(--tl-line-color, var(--tl-border));
+}
 
 /* Chroma / Spectrum: hue rotation */
 @keyframes timeline-builder-line-chroma-scroll {
@@ -756,6 +783,22 @@
   );
   background-size: 200% 100%;
   animation: timeline-builder-line-chroma-scroll 4s linear infinite, timeline-builder-line-chroma 6s linear infinite;
+}
+@keyframes timeline-builder-stem-chroma-scroll {
+  0%   { background-position: 50% 0%; }
+  100% { background-position: 50% 200%; }
+}
+.timeline-builder .track-effect-chroma .h-entry::after {
+  background: linear-gradient(
+    180deg,
+    #ff0000, #ff7700, #ffff00, #00ff00, #0077ff, #8800ff, #ff0000
+  );
+  background-size: 100% 200%;
+  animation: timeline-builder-stem-chroma-scroll 4s linear infinite, timeline-builder-line-chroma 6s linear infinite;
+}
+.timeline-builder .track-effect-chroma .card-img-wrapper.detached::before {
+  border-left-color: #ff0000;
+  animation: timeline-builder-line-chroma 3s linear infinite;
 }
 
 /* EACH EVENT (Horizontal Container) */
