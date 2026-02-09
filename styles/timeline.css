@@ -1898,6 +1898,21 @@
     outline: none;
 }
 
+/* Horizontal settings row for Entry, Line, Dot tabs */
+.timeline-builder .settings-field.settings-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.timeline-builder .settings-field.settings-row label {
+    margin-bottom: 0 !important;
+}
+
+.timeline-builder .settings-field.settings-row .tl-combobox {
+    width: 60%;
+}
+
 /* Settings container selects use standard combobox + full width */
 .timeline-builder .timeline-settings-container .tl-combobox {
     width: 100%;

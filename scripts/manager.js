@@ -776,11 +776,11 @@ export class TimelineManager extends BaseHandlebarsForm {
     const entryHtml = `
       <div class="tab-pane" data-tab="entry">
           <h3 class="settings-section-title">Default Entry Style</h3>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Color</label>
               <select name="defaultColor" class="tl-combobox">${colorOptions}</select>
           </div>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Effect</label>
               <select name="defaultEffect" class="tl-combobox">${effectOptions}</select>
           </div>
@@ -789,22 +789,22 @@ export class TimelineManager extends BaseHandlebarsForm {
     const lineHtml = `
       <div class="tab-pane" data-tab="line">
           <h3 class="settings-section-title">Default Line Style</h3>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Width</label>
               <select name="lineWidth" class="tl-combobox">
                   <option value="1" ${(timeline.lineWidth || 2) == 1 ? "selected" : ""}>1 px</option>
                   <option value="2" ${(timeline.lineWidth || 2) == 2 ? "selected" : ""}>2 px</option>
               </select>
           </div>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Color</label>
               <select name="lineColor" class="tl-combobox">${lineColorOptions}</select>
           </div>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Style</label>
               <select name="lineStyle" class="tl-combobox">${lineStyleOptions}</select>
           </div>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Effect</label>
               <select name="lineEffect" class="tl-combobox">${lineEffectOptions}</select>
           </div>
@@ -812,11 +812,11 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     const dotHtml = `
       <div class="tab-pane" data-tab="dot">
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Dot Size</label>
               <select name="dotSize" class="tl-combobox">${dotSizeOptions}</select>
           </div>
-          <div class="form-group settings-field">
+          <div class="form-group settings-field settings-row">
               <label>Dot Shape</label>
               <select name="dotShape" class="tl-combobox">${dotShapeOptions}</select>
           </div>
