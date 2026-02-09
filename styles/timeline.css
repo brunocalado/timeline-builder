@@ -653,12 +653,18 @@
     transparent 10px
   );
 }
+.timeline-builder .track-style-dashed .card-img-wrapper.detached::before {
+  border-left-style: dashed;
+}
 
 /* Rough / Ink: apply SVG turbulence filter */
 .timeline-builder .track-line.line-style-rough {
   filter: url(#tl-rough-filter);
 }
 .timeline-builder .track-style-rough .h-entry::after {
+  filter: url(#tl-rough-filter);
+}
+.timeline-builder .track-style-rough .card-img-wrapper.detached::before {
   filter: url(#tl-rough-filter);
 }
 
@@ -697,7 +703,8 @@
 .timeline-builder .track-line.line-effect-pulse {
   animation: timeline-builder-line-pulse 2s ease-in-out infinite;
 }
-.timeline-builder .track-effect-pulse .h-entry::after {
+.timeline-builder .track-effect-pulse .h-entry::after,
+.timeline-builder .track-effect-pulse .card-img-wrapper.detached::before {
   animation: timeline-builder-line-pulse 2s ease-in-out infinite;
 }
 
