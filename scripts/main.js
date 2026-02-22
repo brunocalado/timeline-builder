@@ -245,7 +245,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
       title: "Timeline",
       icon: "fa-solid fa-clock-rotate-left",
       button: true,
-      onClick: () => {
+      onChange: () => {
         if (game.user.isGM) {
           TimelineAPI.Manage();
         } else {
