@@ -92,6 +92,12 @@ export class TimelineManager extends BaseHandlebarsForm {
   /** Saved scroll position for entry list container */
   #savedScrollTop = null;
 
+  /** Current search filter term for entries */
+  #searchFilter = "";
+
+  /** Track last rendered timeline ID to detect changes */
+  #lastRenderedTimelineId = null;
+
   static DEFAULT_OPTIONS = {
     id: "timeline-manager",
     classes: ["timeline-builder", "manager"],
@@ -215,6 +221,12 @@ export class TimelineManager extends BaseHandlebarsForm {
   _onRender(context, options) {
     super._onRender(context, options);
 
+    // Reset search filter when timeline changes
+    if (this.#lastRenderedTimelineId !== this.#selectedTimelineId) {
+      this.#searchFilter = "";
+      this.#lastRenderedTimelineId = this.#selectedTimelineId;
+    }
+
     // Convert period inputs to textareas for word wrapping
     this.element.querySelectorAll("input.entry-period").forEach(input => {
       const ta = document.createElement("textarea");
@@ -248,6 +260,9 @@ export class TimelineManager extends BaseHandlebarsForm {
     // Setup input change listeners for live editing
     this.#setupInputListeners();
 
+    // Setup search filter for entries
+    this.#setupSearchFilter();
+
     // Restore entry list scroll position after re-render
     const container = this.element.querySelector(".entry-list-container");
     if (container && this.#selectedTimelineId) {
@@ -272,6 +287,25 @@ export class TimelineManager extends BaseHandlebarsForm {
         game.settings.set(MODULE_ID, "managerScrollPositions", positions);
       }, { passive: true });
     }
+  }
+
+  /**
+   * Apply entry filter based on search term.
+   * Filters entries by period, name, and description.
+   */
+  #applyEntryFilter() {
+    const term = this.#searchFilter.toLowerCase().trim();
+    this.element?.querySelectorAll(".timeline-entry").forEach(el => {
+      if (!term) {
+        el.classList.remove("filtered-out");
+        return;
+      }
+      const period = (el.dataset.period || "").toLowerCase();
+      const name = (el.dataset.name || "").toLowerCase();
+      const description = (el.dataset.description || "").toLowerCase();
+      const matches = period.includes(term) || name.includes(term) || description.includes(term);
+      el.classList.toggle("filtered-out", !matches);
+    });
   }
 
   /**
@@ -326,6 +360,37 @@ export class TimelineManager extends BaseHandlebarsForm {
         this.render();
       });
     });
+  }
+
+  /**
+   * Setup search filter for entries.
+   */
+  #setupSearchFilter() {
+    const searchInput = this.element.querySelector(".entry-search-input");
+    const clearBtn = this.element.querySelector(".search-clear-btn");
+    if (!searchInput) return;
+
+    // Restore previous search term
+    searchInput.value = this.#searchFilter;
+
+    // Listen to input changes
+    searchInput.addEventListener("input", (e) => {
+      this.#searchFilter = e.target.value;
+      this.#applyEntryFilter();
+    });
+
+    // Clear button handler
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        this.#searchFilter = "";
+        searchInput.value = "";
+        this.#applyEntryFilter();
+        searchInput.focus();
+      });
+    }
+
+    // Apply filter after setup
+    this.#applyEntryFilter();
   }
 
   /**

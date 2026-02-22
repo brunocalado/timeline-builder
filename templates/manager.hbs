@@ -78,12 +78,23 @@
     <!-- Event List -->
     <section class="entry-list-container {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}}" {{#if selectedTimeline.dotSize}}style="--tl-dot-size: {{selectedTimeline.dotSize}}px;"{{/if}}>
 
+      <!-- Search Bar -->
+      <div class="manager-search-row">
+        <div class="search-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" class="entry-search-input" placeholder="Search events..." autocomplete="off" maxlength="80">
+          <button type="button" class="search-clear-btn" aria-label="Clear search">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+      </div>
+
       <!-- Visual Vertical Line -->
       <div class="timeline-guide-line"></div>
 
       <div class="entry-list">
         {{#each selectedTimeline.entries}}
-        <article class="timeline-entry {{#if this.hidden}}entry-hidden{{/if}}" data-entry-id="{{this.id}}" draggable="true">
+        <article class="timeline-entry {{#if this.hidden}}entry-hidden{{/if}}" data-entry-id="{{this.id}}" data-period="{{this.period}}" data-name="{{this.name}}" data-description="{{this.description}}" draggable="true">
           
           <!-- COLUMN 1: Time -->
           <div class="entry-col-time">
