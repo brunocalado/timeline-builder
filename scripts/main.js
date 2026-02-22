@@ -99,6 +99,15 @@ Hooks.once("init", () => {
     default: {}
   });
 
+  // Register viewer scroll positions (per-user, per-timeline)
+  game.settings.register(MODULE_ID, "viewerScrollPositions", {
+    name: "Viewer Scroll Positions",
+    scope: "client",
+    config: false,
+    type: Object,
+    default: {}
+  });
+
   // Preload templates
   foundry.applications.handlebars.loadTemplates([
     TEMPLATES.MANAGER,

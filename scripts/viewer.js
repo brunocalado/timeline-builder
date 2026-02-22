@@ -56,6 +56,15 @@ export class TimelineViewer extends BaseHandlebarsForm {
   };
 
   async close(options) {
+    // Save scroll position before closing
+    if (this.#selectedTimelineId) {
+      const container = this.element?.querySelector('#timelineScrollContainer');
+      if (container) {
+        const positions = game.settings.get(MODULE_ID, "viewerScrollPositions") || {};
+        positions[this.#selectedTimelineId] = container.scrollLeft;
+        await game.settings.set(MODULE_ID, "viewerScrollPositions", positions);
+      }
+    }
     Hooks.off("updateSetting", this._settingHook);
     return super.close(options);
   }
@@ -204,6 +213,23 @@ export class TimelineViewer extends BaseHandlebarsForm {
     this.#setupHorizontalScroll(container);
     this.#setupLightbox();
     this.#setupDragToScroll(container);
+
+    // Restore scroll position for current timeline
+    const positions = game.settings.get(MODULE_ID, "viewerScrollPositions") || {};
+    const savedPosition = positions[this.#selectedTimelineId];
+    if (savedPosition !== undefined) {
+      // Use requestAnimationFrame to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        container.scrollLeft = savedPosition;
+      });
+    }
+
+    // Save scroll position on scroll events
+    container.addEventListener('scroll', () => {
+      const positions = game.settings.get(MODULE_ID, "viewerScrollPositions") || {};
+      positions[this.#selectedTimelineId] = container.scrollLeft;
+      game.settings.set(MODULE_ID, "viewerScrollPositions", positions);
+    }, { passive: true });
   }
 
   /**
