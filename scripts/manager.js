@@ -89,6 +89,9 @@ export class TimelineManager extends BaseHandlebarsForm {
   /** Currently selected timeline ID for editing */
   #selectedTimelineId = null;
 
+  /** Saved scroll position for entry list container */
+  #savedScrollTop = null;
+
   static DEFAULT_OPTIONS = {
     id: "timeline-manager",
     classes: ["timeline-builder", "manager"],
@@ -137,6 +140,13 @@ export class TimelineManager extends BaseHandlebarsForm {
       template: TEMPLATES.MANAGER
     }
   };
+
+  /** @override - Save entry list scroll position before re-render */
+  render(options = {}) {
+    const container = this.element?.querySelector(".entry-list-container");
+    this.#savedScrollTop = container?.scrollTop ?? null;
+    return super.render(options);
+  }
 
   /**
    * Prepare context data for rendering.
@@ -209,6 +219,13 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     // Setup input change listeners for live editing
     this.#setupInputListeners();
+
+    // Restore entry list scroll position after re-render
+    if (this.#savedScrollTop != null) {
+      const container = this.element.querySelector(".entry-list-container");
+      if (container) container.scrollTop = this.#savedScrollTop;
+      this.#savedScrollTop = null;
+    }
   }
 
   /**
