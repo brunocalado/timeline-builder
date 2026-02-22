@@ -1763,7 +1763,8 @@
     margin-bottom: 4px;
 }
 /* Entry icon combobox - uses .tl-combobox standard + specific overrides */
-.timeline-builder .timeline-manager-container .entry-icon {
+.timeline-builder .timeline-manager-container .entry-icon,
+.timeline-builder .timeline-manager-container .tl-custom-select {
     flex: 0 0 130px;
 }
 
@@ -2239,4 +2240,86 @@
     border-color: #ffffff;
     color: #ffffff;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================
+   Custom Icon Select
+   =========================== */
+.timeline-builder .tl-custom-select {
+    position: relative;
+    height: 32px;
+    background: #27272a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+}
+.timeline-builder .tl-custom-select:hover {
+    background: #52525b;
+}
+.timeline-builder .tl-custom-select.active {
+    border-color: var(--tl-primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    z-index: 100;
+}
+
+.timeline-builder .tl-select-trigger {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 8px;
+    gap: 8px;
+    color: #d4d4d8;
+}
+.timeline-builder .tl-select-trigger .label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.timeline-builder .tl-select-trigger .chevron {
+    font-size: 0.7em;
+    opacity: 0.7;
+}
+
+.timeline-builder .tl-select-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: -1px;
+    right: -1px;
+    background: #27272a;
+    border: 1px solid var(--tl-primary);
+    border-top: none;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.timeline-builder .tl-custom-select.active .tl-select-options {
+    display: block;
+}
+
+.timeline-builder .tl-select-option {
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #d4d4d8;
+    transition: background 0.1s;
+}
+.timeline-builder .tl-select-option:hover {
+    background: #3f3f46;
+    color: #fff;
+}
+.timeline-builder .tl-select-option.selected {
+    background: #10b981;
+    color: #fff;
+}
+.timeline-builder .tl-select-option i {
+    width: 16px;
+    text-align: center;
 }

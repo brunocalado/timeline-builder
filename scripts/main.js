@@ -109,6 +109,47 @@ Hooks.once("init", () => {
 
   // Register Handlebars partials
   Handlebars.registerPartial("timeline-entry", `{{> ${TEMPLATES.ENTRY}}}`);
+
+  // Register helper for custom icon select
+  Handlebars.registerHelper("renderIconSelect", function(iconOptions, selected) {
+    let html = `<div class="tl-custom-select">`;
+    html += `<input type="hidden" class="entry-icon" value="${selected || ""}">`;
+    
+    let displayLabel = "None";
+    if (selected) {
+        displayLabel = selected;
+        if (iconOptions && !Array.isArray(iconOptions) && iconOptions[selected]) {
+            displayLabel = iconOptions[selected];
+        }
+    }
+
+    html += `<div class="tl-select-trigger">`;
+    if (selected) {
+        html += `<i class="${selected}"></i> <span class="label">${displayLabel}</span>`;
+    } else {
+        html += `<span class="label">None</span>`;
+    }
+    html += `<i class="fa-solid fa-chevron-down chevron"></i></div>`;
+
+    html += `<div class="tl-select-options">`;
+    html += `<div class="tl-select-option" data-value="">None</div>`;
+
+    const processOption = (key, label) => {
+        const isSelected = key === selected ? "selected" : "";
+        return `<div class="tl-select-option ${isSelected}" data-value="${key}"><i class="${key}"></i> ${label}</div>`;
+    };
+
+    if (Array.isArray(iconOptions)) {
+        iconOptions.forEach(opt => html += processOption(opt, opt));
+    } else if (typeof iconOptions === 'object') {
+        for (const [key, label] of Object.entries(iconOptions)) {
+            html += processOption(key, label);
+        }
+    }
+
+    html += `</div></div>`;
+    return new Handlebars.SafeString(html);
+  });
 });
 
 // Setup API when ready
@@ -139,6 +180,50 @@ Hooks.once("ready", () => {
   if (game.user.isGM && !game.settings.get(MODULE_ID, "welcomeScreenShown")) {
     new TimelineWelcome().render(true);
   }
+
+  // Global listener for Custom Select interactions
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".tl-select-trigger")) {
+        const trigger = e.target.closest(".tl-select-trigger");
+        const wrapper = trigger.closest(".tl-custom-select");
+        document.querySelectorAll(".tl-custom-select.active").forEach(el => {
+            if (el !== wrapper) el.classList.remove("active");
+        });
+        wrapper.classList.toggle("active");
+        e.stopPropagation();
+        return;
+    }
+
+    if (e.target.closest(".tl-select-option")) {
+        const option = e.target.closest(".tl-select-option");
+        const wrapper = option.closest(".tl-custom-select");
+        const input = wrapper.querySelector("input.entry-icon");
+        const trigger = wrapper.querySelector(".tl-select-trigger");
+        const value = option.dataset.value;
+        
+        let newContent = `<span class="label">None</span>`;
+        if (value) {
+             const text = option.textContent.trim();
+             newContent = `<i class="${value}"></i> <span class="label">${text}</span>`;
+        }
+        newContent += `<i class="fa-solid fa-chevron-down chevron"></i>`;
+        trigger.innerHTML = newContent;
+
+        const previousValue = input.value;
+        input.value = value;
+        wrapper.classList.remove("active");
+        
+        if (previousValue !== value) {
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        e.stopPropagation();
+        return;
+    }
+
+    document.querySelectorAll(".tl-custom-select.active").forEach(el => {
+        el.classList.remove("active");
+    });
+  });
 });
 
 // Add control button to sidebar
