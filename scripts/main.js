@@ -117,6 +117,15 @@ Hooks.once("init", () => {
     default: {}
   });
 
+  // Register last selected timeline in manager (per-user)
+  game.settings.register(MODULE_ID, "lastSelectedTimeline", {
+    name: "Last Selected Timeline",
+    scope: "client",
+    config: false,
+    type: String,
+    default: ""
+  });
+
   // Preload templates
   foundry.applications.handlebars.loadTemplates([
     TEMPLATES.MANAGER,

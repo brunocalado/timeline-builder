@@ -148,7 +148,7 @@ export class TimelineManager extends BaseHandlebarsForm {
     return super.render(options);
   }
 
-  /** @override - Save scroll position when closing */
+  /** @override - Save scroll position and selected timeline when closing */
   async close(options) {
     if (this.#selectedTimelineId) {
       const container = this.element?.querySelector(".entry-list-container");
@@ -157,6 +157,8 @@ export class TimelineManager extends BaseHandlebarsForm {
         positions[this.#selectedTimelineId] = container.scrollTop;
         await game.settings.set(MODULE_ID, "managerScrollPositions", positions);
       }
+      // Save the selected timeline so it can be restored on next open
+      await game.settings.set(MODULE_ID, "lastSelectedTimeline", this.#selectedTimelineId);
     }
     return super.close(options);
   }
@@ -167,6 +169,19 @@ export class TimelineManager extends BaseHandlebarsForm {
   async _prepareContext(options) {
     const base = await super._prepareContext(options);
     const timelines = this._getTimelines();
+
+    // Restore last selected timeline if not set
+    if (!this.#selectedTimelineId && timelines.length > 0) {
+      const lastTimelineId = game.settings.get(MODULE_ID, "lastSelectedTimeline");
+      // Only restore if the timeline still exists
+      if (lastTimelineId && timelines.some(t => t.id === lastTimelineId)) {
+        this.#selectedTimelineId = lastTimelineId;
+      } else {
+        // Fallback to first timeline if last one was deleted
+        this.#selectedTimelineId = timelines[0].id;
+      }
+    }
+
     const selectedTimeline = this.#selectedTimelineId
       ? this._getTimeline(this.#selectedTimelineId)
       : null;
