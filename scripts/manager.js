@@ -148,6 +148,19 @@ export class TimelineManager extends BaseHandlebarsForm {
     return super.render(options);
   }
 
+  /** @override - Save scroll position when closing */
+  async close(options) {
+    if (this.#selectedTimelineId) {
+      const container = this.element?.querySelector(".entry-list-container");
+      if (container) {
+        const positions = game.settings.get(MODULE_ID, "managerScrollPositions") || {};
+        positions[this.#selectedTimelineId] = container.scrollTop;
+        await game.settings.set(MODULE_ID, "managerScrollPositions", positions);
+      }
+    }
+    return super.close(options);
+  }
+
   /**
    * Prepare context data for rendering.
    */
@@ -221,10 +234,28 @@ export class TimelineManager extends BaseHandlebarsForm {
     this.#setupInputListeners();
 
     // Restore entry list scroll position after re-render
-    if (this.#savedScrollTop != null) {
-      const container = this.element.querySelector(".entry-list-container");
-      if (container) container.scrollTop = this.#savedScrollTop;
-      this.#savedScrollTop = null;
+    const container = this.element.querySelector(".entry-list-container");
+    if (container && this.#selectedTimelineId) {
+      if (this.#savedScrollTop != null) {
+        container.scrollTop = this.#savedScrollTop;
+        this.#savedScrollTop = null;
+      } else {
+        // Restore from saved setting on first render of this timeline
+        const positions = game.settings.get(MODULE_ID, "managerScrollPositions") || {};
+        const savedPosition = positions[this.#selectedTimelineId];
+        if (savedPosition !== undefined && savedPosition > 0) {
+          requestAnimationFrame(() => {
+            container.scrollTop = savedPosition;
+          });
+        }
+      }
+
+      // Save scroll position on scroll events
+      container.addEventListener('scroll', () => {
+        const positions = game.settings.get(MODULE_ID, "managerScrollPositions") || {};
+        positions[this.#selectedTimelineId] = container.scrollTop;
+        game.settings.set(MODULE_ID, "managerScrollPositions", positions);
+      }, { passive: true });
     }
   }
 
@@ -935,8 +966,21 @@ export class TimelineManager extends BaseHandlebarsForm {
   }
 
   static async #onSelectTimeline(event, target) {
-    const timelineId = target.dataset.timelineId;
-    this.#selectedTimelineId = timelineId;
+    const newTimelineId = target.dataset.timelineId;
+
+    // Save scroll position of current timeline before switching
+    if (this.#selectedTimelineId && this.#selectedTimelineId !== newTimelineId) {
+      const container = this.element?.querySelector(".entry-list-container");
+      if (container) {
+        const positions = game.settings.get(MODULE_ID, "managerScrollPositions") || {};
+        positions[this.#selectedTimelineId] = container.scrollTop;
+        await game.settings.set(MODULE_ID, "managerScrollPositions", positions);
+      }
+      // Clear saved scroll to avoid restoring old timeline's position in new timeline
+      this.#savedScrollTop = null;
+    }
+
+    this.#selectedTimelineId = newTimelineId;
     this.render();
   }
 
