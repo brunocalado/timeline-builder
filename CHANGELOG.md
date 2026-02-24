@@ -1,3 +1,6 @@
+# 0.0.5
+- Filepicker work for https://forge-vtt.com/, should solve https://github.com/brunocalado/timeline-builder/issues/1
+
 # 0.0.4
 - small CSS fix for document button
 - Search for Manager

@@ -977,7 +977,8 @@ export class TimelineManager extends BaseHandlebarsForm {
       actions: {
         pickImage: async (event, target) => {
             const input = target.closest(".form-group").querySelector("input[name=backgroundImage]");
-            const fp = new foundry.applications.apps.FilePicker({
+            const FilePicker = foundry.applications.apps.FilePicker.implementation ?? foundry.applications.apps.FilePicker;
+            const fp = new FilePicker({
                 type: "imagevideo",
                 callback: (path) => { input.value = path; }
             });
@@ -1249,7 +1250,8 @@ export class TimelineManager extends BaseHandlebarsForm {
     const entryId = target.dataset.entryId;
     if (!this.#selectedTimelineId || !entryId) return;
 
-    const filePicker = new foundry.applications.apps.FilePicker({
+    const FilePicker = foundry.applications.apps.FilePicker.implementation ?? foundry.applications.apps.FilePicker;
+    const filePicker = new FilePicker({
       type: "image",
       callback: async path => {
         await TimelineStore.updateEntry(this.#selectedTimelineId, entryId, {
