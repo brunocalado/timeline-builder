@@ -54,6 +54,15 @@
   display: flex;
   height: 100%;
   overflow: hidden;
+  --tl-bg-dark: #111111;
+  --tl-bg-panel: #1a1a1a;
+  --tl-bg-card: #222222;
+  --tl-text-main: #f0f0f0;
+  --tl-text-muted: #aaaaaa;
+  --tl-border: #444444;
+  --tl-input-bg: rgba(0, 0, 0, 0.4);
+  color: var(--tl-text-main);
+  background-color: var(--tl-bg-panel);
 }
 
 /* --- Sidebar --- */
@@ -489,13 +498,14 @@
   flex-shrink: 0;
   background: none;
   border: none;
-  color: #fff;
-  font-size: 14px;
+  color: var(--entry-color, #eee);
+  font-size: 0.8em;
   cursor: pointer;
-  transition: color 0.2s;
+  opacity: 0.6;
+  transition: opacity 0.2s;
 }
 .timeline-builder .card-page-link:hover {
-  color: #2563eb;
+  opacity: 1;
 }
 
 .timeline-builder .entry-col-meta {
@@ -522,11 +532,18 @@
    =========================== */
 
 .timeline-builder .timeline-viewer-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  background: var(--tl-bg);
-  position: relative; /* Base for absolute positioning of the bar */
+  overflow: hidden;
+  background-color: #1a1a1a;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
 }
 
 /* --- AUTO-HIDING NAVIGATION BAR --- */
@@ -536,11 +553,11 @@
   left: 0;
   width: 100%;
   z-index: 50; /* Ensures it stays above cards */
-  
+
   display: flex;
   gap: 4px;
   padding: 15px 16px; /* Generous padding to facilitate mouse hit */
-  
+
   /* Background Style (Dark Glass) */
   background: rgba(18, 18, 18, 0.95);
   backdrop-filter: blur(5px);
@@ -551,9 +568,10 @@
   opacity: 0;
   transform: translateY(-50%); /* Moves up a bit, but keeps part in 'trigger zone' */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   overflow-x: auto;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* When hovering over the bar area */
@@ -584,13 +602,17 @@
 /* Custom Horizontal Scroll Area */
 .timeline-builder .timeline-scroll-area {
   flex: 1;
-  overflow-x: auto; 
-  overflow-y: hidden;
+  overflow: auto;
   position: relative;
-  background: radial-gradient(circle at center, #1a1a1a 0%, #111 100%);
   cursor: grab;
   scrollbar-width: auto;
   container-type: size;
+  background-color: #1a1a1a;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /* Specific Custom Scrollbar for Horizontal Area (Taller) */
@@ -629,7 +651,6 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 2px;
   background: var(--tl-line-color, var(--tl-border));
   height: var(--tl-line-width, 2px);
   z-index: 0;
@@ -864,8 +885,7 @@
   position: absolute;
   left: 0;
   width: 100%;
-  max-height: 40vh;
-  max-height: 40cqh;
+  max-height: 240px;
   overflow-y: auto;
 }
 .timeline-builder .card-box::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -898,15 +918,16 @@
   left: 50%;
   transform: translateX(-50%);
   font-family: monospace;
-  color: var(--tl-primary);
+  color: #fff;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 14px;
   white-space: nowrap;
   z-index: 5;
   text-shadow: 0 2px 4px rgba(0,0,0,0.9);
   background: rgba(0, 0, 0, 0.7);
   padding: 2px 8px;
   border-radius: 4px;
+  border: 1px solid var(--entry-color);
 }
 
 .timeline-builder .h-entry:nth-child(odd) .entry-date { top: 20px; }
@@ -973,10 +994,14 @@
 }
 
 .timeline-builder .card-title {
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   font-size: 1.1rem;
-  color: #fff;
+  font-weight: 700;
   line-height: 1.2;
+  border-left: 5px solid var(--entry-color, #777);
+  padding: 4px 10px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
 }
@@ -1081,7 +1106,7 @@
 }
 
 /* Glitch */
-@keyframes timeline-builder-glitch {
+@keyframes timeline-builder-card-glitch {
   0%, 90% { transform: translate(0); filter: none; }
   91% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
   92% { transform: translate(1px, -1px); filter: none; }
@@ -1089,7 +1114,7 @@
   100% { transform: translate(0); filter: none; }
 }
 .timeline-builder .effect-glitch .card-box {
-  animation: timeline-builder-glitch 4s infinite;
+  animation: timeline-builder-card-glitch 4s infinite;
   border: 1px solid var(--effect-color, #2ec4a0);
   box-shadow: 0 0 5px var(--effect-color, #2ec4a0);
 }
@@ -1266,25 +1291,9 @@
 }
 
 /* ===========================
-   MOVED FROM VIEWER.HBS
+   VIEWER — FILTER MENU
    =========================== */
 
-.timeline-builder .timeline-viewer-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    /* Dot grid background pattern */
-    background-color: #1a1a1a;
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-    background-size: 20px 20px;
-    background-position: 0 0;
-}
 /* Floating Filter Menu */
 .timeline-builder .timeline-filter-menu {
   position: absolute;
@@ -1533,26 +1542,6 @@
     color: var(--tl-danger, #ff4444);
 }
 
-/* --- ESTILO DO CARD TITLE ATUALIZADO (BORDA GROSSA) --- */
-.timeline-builder .card-title {
-    margin: 0 0 8px 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    line-height: 1.2;
-
-    /* A Mágica da Borda Grossa */
-    border-left: 5px solid var(--entry-color, #777);
-    padding: 4px 10px 4px 10px; /* Espaço ajustado para o ícone não grudar na borda */
-
-    /* Opcional: Gradiente sutil para destacar o header */
-    background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-
-    /* Opcional: O texto assume a cor da borda/evento */
-    color: #ffffff;
-
-    display: flex;
-    align-items: center;
-}
 
 @keyframes tl-title-scroll {
   0%   { transform: translateX(0); }
@@ -1583,18 +1572,6 @@
     font-size: 0.8em;
     margin-right: 5px;
     color: #ffffff;
-}
-
-.timeline-builder .card-page-link {
-    margin-left: auto; /* Força o ícone para o extremo direito */
-    font-size: 0.8em;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-    color: var(--entry-color, #eee);
-}
-.timeline-builder .card-page-link:hover {
-    opacity: 1;
 }
 
 /* Ajuste para quando o texto é misterioso (redacted) */
@@ -1752,24 +1729,6 @@
     height: var(--img-offset);
 }
 
-/* Ensure scroll areas are scrollable */
-.timeline-builder .timeline-scroll-area {
-    flex: 1;
-    overflow: auto;
-    /* Dot grid background pattern */
-    background-color: #1a1a1a;
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
-    background-size: 20px 20px;
-    background-position: 0 0;
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-.timeline-builder .timeline-tabs {
-    flex-shrink: 0;
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
 /* Lightbox Overlay (Global) */
 .timeline-lightbox {
     position: fixed;
@@ -1799,18 +1758,6 @@
     cursor: default;
 }
 
-/* Refactored Inline Styles */
-.timeline-builder .entry-date {
-    color: #fff;
-    border: 1px solid var(--entry-color);
-    font-size: 14px;
-}
-
-.timeline-builder .card-box {
-    max-height: 240px;
-    overflow-y: auto;
-}
-
 .timeline-builder .hidden-icon.mystery-icon {
     color: #ffffff;
 }
@@ -1822,22 +1769,8 @@
 }
 
 /* ===========================
-   MOVED FROM MANAGER.HBS
-   High Contrast & Readability
+   MANAGER — HIGH CONTRAST OVERRIDES
    =========================== */
-
-.timeline-builder .timeline-manager-container {
-    --tl-bg-dark: #111111;
-    --tl-bg-panel: #1a1a1a;
-    --tl-bg-card: #222222;
-    --tl-text-main: #f0f0f0;
-    --tl-text-muted: #aaaaaa;
-    --tl-border: #444444;
-    --tl-input-bg: rgba(0, 0, 0, 0.4);
-    
-    color: var(--tl-text-main);
-    background-color: var(--tl-bg-panel);
-}
 
 .timeline-builder .timeline-manager-container .timeline-sidebar {
     background-color: var(--tl-bg-dark);
