@@ -1,4 +1,9 @@
+# 0.0.6
+
+- https://github.com/brunocalado/timeline-builder/issues/4
+
 # 0.0.5
+
 - Filepicker work for https://forge-vtt.com/, should solve https://github.com/brunocalado/timeline-builder/issues/1
 
 # 0.0.4

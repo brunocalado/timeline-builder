@@ -1539,19 +1539,43 @@
     font-size: 1.1rem;
     font-weight: 700;
     line-height: 1.2;
-    
+
     /* A Mágica da Borda Grossa */
     border-left: 5px solid var(--entry-color, #777);
     padding: 4px 10px 4px 10px; /* Espaço ajustado para o ícone não grudar na borda */
-    
+
     /* Opcional: Gradiente sutil para destacar o header */
     background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-    
+
     /* Opcional: O texto assume a cor da borda/evento */
     color: #ffffff;
-    
+
     display: flex;
     align-items: center;
+}
+
+@keyframes tl-title-scroll {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(0); }
+  85%  { transform: translateX(var(--tl-title-overflow, 0px)); }
+  100% { transform: translateX(var(--tl-title-overflow, 0px)); }
+}
+
+/* Clips only the title text, keeping .card-page-link always visible */
+.timeline-builder .card-title .title-clip {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.timeline-builder .card-title .title-inner {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Auto-scroll for titles that overflow the card width */
+.timeline-builder .card-title.title-marquee .title-inner {
+    animation: tl-title-scroll 6s ease-in-out infinite alternate;
 }
 
 .timeline-builder .card-title .hidden-icon {

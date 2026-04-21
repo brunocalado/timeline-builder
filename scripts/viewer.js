@@ -213,6 +213,7 @@ export class TimelineViewer extends BaseHandlebarsForm {
     this.#setupHorizontalScroll(container);
     this.#setupLightbox();
     this.#setupDragToScroll(container);
+    this.#applyTitleMarquee();
 
     // Restore scroll position for current timeline
     const positions = game.settings.get(MODULE_ID, "viewerScrollPositions") || {};
@@ -393,6 +394,27 @@ export class TimelineViewer extends BaseHandlebarsForm {
       const x = e.pageX - container.offsetLeft;
       const walk = (x - startX) * 1.5;
       container.scrollLeft = scrollLeft - walk;
+    });
+  }
+
+  /**
+   * Detects `.card-title` elements whose `.title-inner` text overflows the card
+   * width and applies a marquee scroll animation via CSS class + custom property.
+   * Called after render so the DOM is fully laid out.
+   */
+  #applyTitleMarquee() {
+    this.element.querySelectorAll(".card-title").forEach(titleEl => {
+      const clip = titleEl.querySelector(".title-clip");
+      const inner = titleEl.querySelector(".title-inner");
+      if (!clip || !inner) return;
+      // Reset previous state so re-renders recalculate correctly
+      titleEl.classList.remove("title-marquee");
+      titleEl.style.removeProperty("--tl-title-overflow");
+      const overflow = inner.scrollWidth - clip.clientWidth;
+      if (overflow > 0) {
+        titleEl.classList.add("title-marquee");
+        titleEl.style.setProperty("--tl-title-overflow", `-${overflow}px`);
+      }
     });
   }
 

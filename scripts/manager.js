@@ -248,7 +248,7 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     // Enforce max length on entry names
     this.element.querySelectorAll(".entry-name").forEach(input => {
-      input.setAttribute("maxlength", "25");
+      input.setAttribute("maxlength", "40");
     });
 
     // Setup drag and drop for entries

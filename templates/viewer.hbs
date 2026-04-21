@@ -103,7 +103,7 @@
                {{#if this.hidden}}<i class="fa-solid fa-eye-slash hidden-icon" title="Hidden from players"></i>{{/if}}
                {{#if this.mystery.text}}<i class="fa-solid fa-mask hidden-icon mystery-icon" title="Mystery: text"></i>{{/if}}
                {{#if this.icon}}<i class="{{this.icon}} entry-icon-display"></i>{{/if}}
-               {{this.name}}
+               <span class="title-clip"><span class="title-inner">{{this.name}}</span></span>
                {{#if this.pageUuid}}<span class="card-page-link" data-action="openLinkedPage" data-page-uuid="{{this.pageUuid}}" title="{{this.pageName}}"><i class="fa-solid fa-file-lines"></i></span>{{/if}}
             </h3>
 
