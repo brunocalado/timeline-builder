@@ -1,0 +1,53 @@
+/* ===========================
+   Variables & Theme
+   =========================== */
+.timeline-builder {
+  --tl-bg: #111111;
+  --tl-panel: #161616;
+  --tl-border: #2a2a2a;
+  --tl-border-hover: #444;
+  --tl-primary: #2ec4a0;
+  --tl-primary-hover: #26a88a;
+  --tl-text: #e2e8f0;
+  --tl-text-muted: #94a3b8;
+  --tl-danger: #ef4444;
+  --tl-success: #22c55e;
+
+  /* Semantic Colors */
+  --tl-selection-bg: #123915;
+  --tl-selection-border: #1a5422;
+  --tl-mystery: #a855f7;
+  --tl-card-bg: #191919;
+
+  /* Manager Dimensions */
+  --tl-time-width: 110px;
+  --tl-dot-size: 12px;
+
+  /* Horizontal Viewer Dimensions */
+  --tl-card-width: 300px;
+  --tl-track-height: 2px;
+  --tl-stem-height: 30px;
+}
+
+/* Basic reset for Foundry windows */
+.timeline-builder .window-content {
+  padding: 0;
+  background: var(--tl-bg);
+  color: var(--tl-text);
+  font-family: "Signika", sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* Global Scrollbars (Thin) */
+.timeline-builder *::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.timeline-builder *::-webkit-scrollbar-track {
+  background: transparent;
+}
+.timeline-builder *::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}

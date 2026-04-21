@@ -23,7 +23,11 @@
     "scripts/main.js"
   ],
   "styles": [
-    "styles/timeline.css"
+    "styles/timeline-base.css",
+    "styles/timeline-manager.css",
+    "styles/timeline-viewer.css",
+    "styles/timeline-effects.css",
+    "styles/timeline-settings.css"
   ],
 
   "packs": [

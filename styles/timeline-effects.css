@@ -1,0 +1,230 @@
+/* ===========================
+   VISUAL EFFECTS
+   =========================== */
+
+@keyframes timeline-builder-glow {
+  0%, 100% { box-shadow: 0 0 0 var(--effect-color, #2ec4a0); border-color: var(--tl-border); }
+  50% { box-shadow: 0 0 15px var(--effect-color, #2ec4a0); border-color: var(--effect-color, var(--tl-primary)); }
+}
+
+@keyframes timeline-builder-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.timeline-builder .effect-glow .card-box {
+  animation: timeline-builder-glow 2s infinite ease-in-out;
+}
+
+.timeline-builder .effect-float .card-box {
+  animation: timeline-builder-float 3s infinite ease-in-out;
+}
+
+/* Shake */
+@keyframes timeline-builder-shake {
+  0%, 100% { transform: translateX(0); }
+  1%, 3%, 5%, 7%, 9% { transform: translateX(-2px); }
+  2%, 4%, 6%, 8%, 10% { transform: translateX(2px); }
+  11% { transform: translateX(0); }
+}
+.timeline-builder .effect-shake .card-box {
+  animation: timeline-builder-shake 9s cubic-bezier(.36,.07,.19,.97) both infinite;
+}
+
+/* Pulse */
+@keyframes timeline-builder-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.timeline-builder .effect-pulse .card-box {
+  animation: timeline-builder-pulse 2s infinite ease-in-out;
+}
+
+/* Glitch */
+@keyframes timeline-builder-card-glitch {
+  0%, 90% { transform: translate(0); filter: none; }
+  91% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+  92% { transform: translate(1px, -1px); filter: none; }
+  93% { transform: translate(-1px, 2px); filter: invert(0.2); }
+  100% { transform: translate(0); filter: none; }
+}
+.timeline-builder .effect-glitch .card-box {
+  animation: timeline-builder-card-glitch 4s infinite;
+  border: 1px solid var(--effect-color, #2ec4a0);
+  box-shadow: 0 0 5px var(--effect-color, #2ec4a0);
+}
+
+/* Glow Strong */
+@keyframes timeline-builder-glow-strong {
+  0%, 100% { box-shadow: 0 0 0 var(--effect-color, #2ec4a0); border-color: var(--tl-border); }
+  50% { box-shadow: 0 0 30px var(--effect-color, #2ec4a0); border-color: var(--effect-color, var(--tl-primary)); }
+}
+.timeline-builder .effect-glow-strong .card-box {
+  animation: timeline-builder-glow-strong 2s infinite ease-in-out;
+}
+
+/* ===========================
+   MYSTERY MODE
+   =========================== */
+
+/* Mystery entry border */
+.timeline-builder .mystery-entry::before {
+  background: var(--tl-mystery);
+  box-shadow: 0 0 0 1px var(--tl-mystery);
+}
+
+/* Mystery title centering (flex override) */
+.timeline-builder .card-title.mystery-redacted {
+  justify-content: center;
+}
+
+/* Redacted text effect */
+.timeline-builder .mystery-redacted .mystery-placeholder {
+  color: var(--tl-mystery);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* Mystery text card styling */
+.timeline-builder .mystery-text {
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  background: rgba(168, 85, 247, 0.05) !important;
+}
+
+/* Mystery description large centered */
+.timeline-builder .mystery-desc-lg {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 15px 0;
+  margin: 0;
+}
+
+/* Mystery date badge */
+.timeline-builder .entry-date.mystery-redacted {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  color: var(--tl-mystery) !important;
+  font-style: italic;
+}
+
+/* GM: mystery mask overlay on image */
+.timeline-builder .mystery-img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.timeline-builder .mystery-img-overlay i {
+  font-size: 2rem;
+  color: var(--tl-mystery);
+  opacity: 0.8;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+/* Manager: mystery entry indicator */
+.timeline-builder .timeline-entry.entry-mystery {
+  border-left: 2px solid rgba(168, 85, 247, 0.4);
+}
+
+/* ===========================
+   WELCOME SCREEN
+   =========================== */
+
+.timeline-builder.welcome-window .window-content {
+    background: var(--tl-card-bg);
+    background-image: radial-gradient(circle at center, #2a2a2a 0%, var(--tl-card-bg) 100%);
+    color: #e0e0e0;
+    padding: 20px;
+    border: 1px solid #d4af37;
+    box-shadow: 0 0 15px #000;
+}
+
+.timeline-builder.welcome-window .welcome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timeline-builder.welcome-window .welcome-title {
+    font-family: var(--font-primary);
+    color: #d4af37;
+    text-align: center;
+    text-transform: uppercase;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.timeline-builder.welcome-window .welcome-description {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+.timeline-builder.welcome-window .welcome-avatar {
+    width: 100px;
+    animation: welcome-float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+}
+
+@keyframes welcome-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.timeline-builder.welcome-window .welcome-avatar-wrapper {
+    text-align: center;
+    margin-bottom: -25px;
+    position: relative;
+    z-index: 0;
+}
+
+.timeline-builder.welcome-window .welcome-action {
+    text-align: center;
+    margin-top: 35px;
+    position: relative;
+    z-index: 1;
+}
+
+.timeline-builder.welcome-window .welcome-action.no-margin {
+    margin-top: 0;
+}
+
+.timeline-builder.welcome-window .journal-btn {
+    background: #5a2d82;
+    color: #fff;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: 1px solid #8a4baf;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.timeline-builder.welcome-window .journal-btn:hover {
+    background: #6d369e;
+    transform: scale(1.05);
+}
+
+.timeline-builder.welcome-window .journal-btn.btn-danger {
+    background: #7a1d1d;
+    border-color: #ff5555;
+}
+
+.timeline-builder.welcome-window .welcome-divider {
+    border: 0;
+    width: 100%;
+    height: 3px;
+    background-image: linear-gradient(to right, transparent, #ffd700, transparent);
+    margin: 10px 0;
+}
