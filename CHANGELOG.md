@@ -1,5 +1,6 @@
 # 0.0.6
 
+- CSS split
 - CSS vars
 - [Fixed] CSS: duplicate `@keyframes timeline-builder-glitch` — card glitch animation renamed to `timeline-builder-card-glitch`, fixing the broken line-glitch effect
 - [Fixed] CSS: `.card-box` conflicting `max-height` values merged into a single `240px`
