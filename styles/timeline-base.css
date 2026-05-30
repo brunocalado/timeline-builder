@@ -39,6 +39,13 @@
   overflow: hidden;
 }
 
+/* Neutralize Foundry's global active-button outline inside this module */
+.timeline-builder a.button.active,
+.timeline-builder button.active {
+  outline: none;
+  box-shadow: none;
+}
+
 /* Global Scrollbars (Thin) */
 .timeline-builder *::-webkit-scrollbar {
   width: 5px;

@@ -1,3 +1,8 @@
+# 0.1.0
+
+- v14 only
+- [Fixed] CSS: neutralize Foundry VTT's global `.active` button outline and box-shadow — module scope only
+
 # 0.0.6
 
 - CSS split
