@@ -2,7 +2,6 @@
   "id": "timeline-builder",
   "title": "⏳ Timeline Builder",
   "description": "A module for creating and managing campaign timelines!",
-
   "media": [
     {
       "type": "setup",
@@ -12,32 +11,34 @@
       "flags": {}
     }
   ],
-
-  "version": "0.1.0",
+  "version": "0.1.1",
   "compatibility": {
     "minimum": "14",
-    "verified": "14"    
+    "verified": "14"
   },
-
   "authors": [
     {
       "name": "Mestre Digital",
-      "url": "https://www.youtube.com/@mestredigital"
+      "url": "https://www.youtube.com/@mestredigital",
+      "flags": {}
     }
   ],
-
   "esmodules": [
     "scripts/main.js"
   ],
-
   "styles": [
-    "styles/timeline-base.css",
-    "styles/timeline-manager.css",
-    "styles/timeline-viewer.css",
-    "styles/timeline-effects.css",
-    "styles/timeline-settings.css"
-  ],
 
+    "styles/timeline-base.css",
+
+    "styles/timeline-manager.css",
+
+    "styles/timeline-viewer.css",
+
+    "styles/timeline-effects.css",
+
+    "styles/timeline-settings.css"
+
+  ],
   "packs": [
     {
       "label": "Macros",

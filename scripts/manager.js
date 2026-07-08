@@ -7,6 +7,7 @@ import { TimelineStore } from "./store.js";
 import { getGlassStyle, resolveEntryDisplayProps, resolvePageNames } from "./helpers.js";
 import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
 import { BaseCRUDForm } from "./forms/BaseCRUDForm.js";
+import { exportTimelineToPdf } from "./export-pdf.js";
 
 const { DialogV2 } = foundry.applications.api;
 
@@ -108,7 +109,7 @@ export class TimelineManager extends BaseHandlebarsForm {
       resizable: true
     },
     position: {
-      width: 1000,
+      width: 1080,
       height: 650
     },
     actions: {
@@ -117,6 +118,7 @@ export class TimelineManager extends BaseHandlebarsForm {
       manageTags: TimelineManager.#onManageTags,
       manageColors: TimelineManager.#onManageColors,
       openViewer: TimelineManager.#onOpenViewer,
+      exportPdf: TimelineManager.#onExportPdf,
       broadcastTimeline: TimelineManager.#onBroadcastTimeline,
       managePermissions: TimelineManager.#onManagePermissions,
       selectTimeline: TimelineManager.#onSelectTimeline,
@@ -1022,6 +1024,52 @@ export class TimelineManager extends BaseHandlebarsForm {
   static async #onOpenViewer(event, target) {
     if (this.#selectedTimelineId) {
       Timeline.Open(this.#selectedTimelineId);
+    }
+  }
+
+  /**
+   * Export the selected timeline as a downloadable PDF file.
+   * As a GM-only tool, the export includes every entry unmasked (no hidden/mystery
+   * filtering) so the maintainer gets the complete timeline.
+   * @param {PointerEvent} event
+   * @param {HTMLElement} target - The clicked export button.
+   */
+  static async #onExportPdf(event, target) {
+    const timeline = this.#selectedTimelineId ? this._getTimeline(this.#selectedTimelineId) : null;
+    if (!timeline || !timeline.entries?.length) {
+      return this._notifyWarning("There is nothing to export in this timeline.");
+    }
+
+    // Resolve tag ids to { label, color } for the PDF pills.
+    const tagMap = new Map(this._getTags().map(t => [t.id, t]));
+    const model = {
+      name: timeline.name || "Timeline",
+      entries: [...timeline.entries]
+        .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+        .map(e => ({
+          period: e.period || "",
+          name: e.name || "",
+          description: e.description || "",
+          tags: (e.tagIds || [])
+            .map(id => tagMap.get(id))
+            .filter(Boolean)
+            .map(t => ({ label: t.label, color: t.color })),
+          img: e.img || "",
+          color: e.color || timeline.defaultColor || ""
+        }))
+    };
+
+    // Guard against double-clicks while images load and the PDF is generated.
+    if (target.disabled) return;
+    target.disabled = true;
+    try {
+      this._notifyInfo("Generating timeline PDF…");
+      await exportTimelineToPdf(model);
+    } catch (err) {
+      console.error("Timeline Builder | PDF export failed:", err);
+      this._notifyError("Failed to export the timeline as PDF.");
+    } finally {
+      target.disabled = false;
     }
   }
 

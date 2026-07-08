@@ -187,6 +187,9 @@
 .timeline-builder .add-entry-btn.preview-btn:hover { background: #244d75; border-color: rgba(59, 130, 246, 0.5); }
 .timeline-builder .add-entry-btn.broadcast-btn { background: rgba(59, 130, 246, 0.3); border-color: rgba(59, 130, 246, 0.5); color: #fff; }
 .timeline-builder .add-entry-btn.broadcast-btn:hover { background: rgba(59, 130, 246, 0.5); border-color: rgba(59, 130, 246, 0.7); }
+.timeline-builder .add-entry-btn.export-pdf-btn { background: #5c1a1a; border-color: rgba(239, 68, 68, 0.3); }
+.timeline-builder .add-entry-btn.export-pdf-btn:hover { background: #752424; border-color: rgba(239, 68, 68, 0.5); }
+.timeline-builder .add-entry-btn:disabled { cursor: progress; opacity: 0.6; }
 
 .timeline-builder .entry-list-container {
   flex: 1;
