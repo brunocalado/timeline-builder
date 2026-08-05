@@ -11,10 +11,11 @@
       "flags": {}
     }
   ],
-  "version": "0.1.1",
+  "version": "0.1.2",
   "compatibility": {
     "minimum": "14",
-    "verified": "14"
+    "verified": "14",
+    "maximum": "14"
   },
   "authors": [
     {
@@ -27,17 +28,24 @@
     "scripts/main.js"
   ],
   "styles": [
-
-    "styles/timeline-base.css",
-
-    "styles/timeline-manager.css",
-
-    "styles/timeline-viewer.css",
-
-    "styles/timeline-effects.css",
-
-    "styles/timeline-settings.css"
-
+    {
+      "src": "styles/timeline-base.css"
+    },
+    {
+      "src": "styles/timeline-manager.css"
+    },
+    {
+      "src": "styles/timeline-viewer.css"
+    },
+    {
+      "src": "styles/timeline-effects.css"
+    },
+    {
+      "src": "styles/timeline-settings.css"
+    },
+    {
+      "src": "styles/timeline-import-export.css"
+    }
   ],
   "packs": [
     {

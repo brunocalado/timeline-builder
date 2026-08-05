@@ -17,6 +17,7 @@
 - **🏷️ Powerful Organization**: Use **Tags** to categorize events (e.g., "War", "Politics", "Personal") and let players filter the view to see exactly what matters to them.
 - **👑 GM Control**: Manage what players see with granular visibility settings. Hide entire timelines or specific events, and use **Broadcast** to show a timeline to all connected players instantly.
 - **📄 PDF Export**: Turn any timeline into a clean, shareable document. Click the **PDF** button in the Manager to download a paginated file with every event's timeframe, title, description, tags, and images.
+- **📤 Import / Export**: Back up timelines or move them to another world. Open **Configure Settings → Import / Export** to export any selection of timelines as a JSON file, then import them elsewhere — id conflicts are detected automatically, letting you skip, replace, or import as a copy.
 
 ## 🚀 Getting Started
 

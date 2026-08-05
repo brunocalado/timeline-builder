@@ -7,6 +7,7 @@ import { MODULE_ID, SETTINGS, TEMPLATES, DEFAULT_COLORS } from "./config.js";
 import { TimelineManager } from "./manager.js";
 import { TimelineViewer } from "./viewer.js";
 import { TimelineWelcome } from "./welcome.js";
+import { ImportExportForm } from "./forms/import-export-form.js";
 
 // Singleton instances
 let managerInstance = null;
@@ -126,12 +127,24 @@ Hooks.once("init", () => {
     default: ""
   });
 
+  // Register the Import/Export menu button in Foundry's Configure Settings.
+  // GM-only, same as the other data-modifying tools (PDF export, tag/color managers).
+  game.settings.registerMenu(MODULE_ID, "importExportMenu", {
+    name: "Import / Export Timelines",
+    label: "Import / Export",
+    hint: "Export selected timelines to a JSON file, or import timelines from a JSON file.",
+    icon: "fa-solid fa-file-import",
+    type: ImportExportForm,
+    restricted: true
+  });
+
   // Preload templates
   foundry.applications.handlebars.loadTemplates([
     TEMPLATES.MANAGER,
     TEMPLATES.VIEWER,
     TEMPLATES.ENTRY,
-    TEMPLATES.WELCOME
+    TEMPLATES.WELCOME,
+    TEMPLATES.IMPORT_EXPORT
   ]);
 
   // Register Handlebars partials

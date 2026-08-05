@@ -1,0 +1,42 @@
+<div class="import-export-container">
+    <nav class="settings-tabs">
+        <div class="settings-tab active" data-tab="export"><i class="fa-solid fa-file-export"></i> Export</div>
+        <div class="settings-tab" data-tab="import"><i class="fa-solid fa-file-import"></i> Import</div>
+    </nav>
+
+    <div class="tab-pane active" data-tab="export">
+        {{#if timelines.length}}
+        <div class="ie-toolbar">
+            <label class="ie-select-all">
+                <input type="checkbox" data-action="toggleSelectAllExport">
+                Select All
+            </label>
+        </div>
+        <div class="ie-list">
+            {{#each timelines}}
+            <label class="ie-list-item">
+                <input type="checkbox" class="export-check" value="{{this.id}}">
+                <span class="ie-item-name">{{this.name}}</span>
+                <span class="ie-item-meta">{{this.entryLabel}}</span>
+            </label>
+            {{/each}}
+        </div>
+        <button type="button" class="tl-action-btn" data-action="exportSelected">
+            <i class="fa-solid fa-download"></i> Export Selected
+        </button>
+        {{else}}
+        <p class="ie-empty-state">There are no timelines to export yet.</p>
+        {{/if}}
+    </div>
+
+    <div class="tab-pane" data-tab="import">
+        <p class="ie-hint">Choose a Timeline Builder JSON export file to import.</p>
+        <div class="ie-file-picker">
+            <input type="file" id="importFileInput" accept="application/json,.json">
+        </div>
+        <div class="ie-import-preview"></div>
+        <button type="button" class="tl-action-btn" data-action="importSelected" disabled>
+            <i class="fa-solid fa-upload"></i> Import Selected
+        </button>
+    </div>
+</div>

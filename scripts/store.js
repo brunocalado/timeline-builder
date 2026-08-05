@@ -343,6 +343,38 @@ export class TimelineStore {
   }
 
   /**
+   * Import timelines from an export file, applying a per-item conflict resolution.
+   * Writes the whole result back with a single settings update.
+   * @param {Array<{timeline: Object, resolution: "new"|"copy"|"replace"}>} items
+   * @returns {Promise<Array<Object>>} The timeline objects that were written.
+   */
+  static async importTimelines(items) {
+    const timelines = this.getTimelines();
+    const applied = [];
+
+    for (const { timeline, resolution } of items) {
+      const clone = foundry.utils.deepClone(timeline);
+      const conflicts = timelines.some(t => t.id === clone.id);
+
+      if (resolution === "replace" && conflicts) {
+        const index = timelines.findIndex(t => t.id === clone.id);
+        timelines[index] = clone;
+      } else {
+        // "new" (no conflict) or "copy" (deliberately duplicated): avoid id collisions.
+        if (conflicts) {
+          clone.id = foundry.utils.randomID();
+          clone.name = `${clone.name} (Imported)`;
+        }
+        timelines.push(clone);
+      }
+      applied.push(clone);
+    }
+
+    await game.settings.set(MODULE_ID, SETTINGS.DATA, timelines);
+    return applied;
+  }
+
+  /**
    * Reorder entries based on drag & drop.
    * @param {string} timelineId - Timeline ID.
    * @param {Array<string>} orderedIds - Array of entry IDs in new order.

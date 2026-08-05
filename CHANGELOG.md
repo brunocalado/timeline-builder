@@ -1,3 +1,7 @@
+# 0.1.2
+
+- [Added] Import and export timelines as JSON files. A new **Import / Export** menu in Foundry's Configure Settings (under this module's section) lets you pick which timelines to export, and detects id conflicts on import so you can skip, replace, or import each one as a copy.
+
 # 0.1.1
 
 - [Added] Export a timeline to PDF from the Timeline Manager toolbar (new **PDF** button). Generates a clean, paginated document (timeframe, title, description, tag pills and embedded images) as a real downloadable `.pdf` file — no external dependencies.
