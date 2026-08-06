@@ -1,3 +1,7 @@
+# 0.1.3
+
+- Removed AI assets
+
 # 0.1.2
 
 - https://github.com/brunocalado/timeline-builder/issues/7
