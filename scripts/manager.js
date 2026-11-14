@@ -1,3 +1,11 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Timeline Builder - Manager Application (GM Only)
  */
@@ -8,6 +16,7 @@ import { getGlassStyle, resolveEntryDisplayProps, resolvePageNames } from "./hel
 import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
 import { BaseCRUDForm } from "./forms/BaseCRUDForm.js";
 import { exportTimelineToPdf } from "./export-pdf.js";
+import { PeriodsForm } from "./forms/periods-form.js";
 
 const { DialogV2 } = foundry.applications.api;
 
@@ -99,6 +108,9 @@ export class TimelineManager extends BaseHandlebarsForm {
   /** Track last rendered timeline ID to detect changes */
   #lastRenderedTimelineId = null;
 
+  /** The open Periods window, at most one; it never outlives its timeline */
+  #periodsForm = null;
+
   static DEFAULT_OPTIONS = {
     id: "timeline-manager",
     classes: ["timeline-builder", "manager"],
@@ -136,6 +148,7 @@ export class TimelineManager extends BaseHandlebarsForm {
       pickEffect: TimelineManager.#onPickEffect,
       insertEntry: TimelineManager.#onInsertEntry,
       sortTimeline: TimelineManager.#onSortTimeline,
+      managePeriods: TimelineManager.#onManagePeriods,
       adjustImageFocus: TimelineManager.#onAdjustImageFocus,
       configureMystery: TimelineManager.#onConfigureMystery,
       openLinkedPage: TimelineManager.#onOpenLinkedPage,
@@ -153,7 +166,10 @@ export class TimelineManager extends BaseHandlebarsForm {
   render(options = {}) {
     const container = this.element?.querySelector(".entry-list-container");
     this.#savedScrollTop = container?.scrollTop ?? null;
-    return super.render(options);
+    const rendering = super.render(options);
+    // Every manager re-render refreshes the Periods window (entry labels, anchors, statuses).
+    if (this.#periodsForm?.rendered) this.#periodsForm.render();
+    return rendering;
   }
 
   /** @override - Save scroll position and selected timeline when closing */
@@ -168,6 +184,7 @@ export class TimelineManager extends BaseHandlebarsForm {
       // Save the selected timeline so it can be restored on next open
       await game.settings.set(MODULE_ID, "lastSelectedTimeline", this.#selectedTimelineId);
     }
+    await this.#closePeriodsForm();
     return super.close(options);
   }
 
@@ -506,6 +523,12 @@ export class TimelineManager extends BaseHandlebarsForm {
       [field]: input.value
     });
 
+    // Live edits do not re-render the manager (focus would be lost), so the Periods window,
+    // whose anchor options are labelled "timeframe · name", is refreshed directly.
+    if ((field === "name" || field === "period") && this.#periodsForm?.rendered) {
+      this.#periodsForm.render();
+    }
+
     if (field === "period") {
       const timeline = TimelineStore.getTimeline(this.#selectedTimelineId);
       if (timeline?.autoSort) {
@@ -736,6 +759,9 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     if (this.#selectedTimelineId) {
       await TimelineStore.updateEntryOrder(this.#selectedTimelineId, orderedIds);
+      // The drop already moved the row, so the manager is not re-rendered; the Periods window's
+      // entry order and overlap statuses still follow the new order.
+      if (this.#periodsForm?.rendered) this.#periodsForm.render();
     }
   }
 
@@ -1109,6 +1135,8 @@ export class TimelineManager extends BaseHandlebarsForm {
       this.#savedScrollTop = null;
     }
 
+    if (this.#periodsForm?.timelineId !== newTimelineId) await this.#closePeriodsForm();
+
     this.#selectedTimelineId = newTimelineId;
     this.render();
   }
@@ -1179,6 +1207,25 @@ export class TimelineManager extends BaseHandlebarsForm {
     }
   }
 
+  /**
+   * Open the Periods window for the selected timeline. A window still bound to another timeline
+   * is closed first; a window the user closed is reopened with render(true).
+   */
+  static async #onManagePeriods(event, target) {
+    if (!this.#selectedTimelineId) return;
+    if (this.#periodsForm?.timelineId !== this.#selectedTimelineId) {
+      await this.#closePeriodsForm();
+      this.#periodsForm = new PeriodsForm(this.#selectedTimelineId, { onChange: () => this.render() });
+    }
+    this.#periodsForm.render(true);
+  }
+
+  /** Close the Periods window, if any, and forget it. */
+  async #closePeriodsForm() {
+    await this.#periodsForm?.close();
+    this.#periodsForm = null;
+  }
+
   static async #onDeleteTimeline(event, target) {
     const timelineId = target.dataset.timelineId;
     const timeline = TimelineStore.getTimeline(timelineId);
@@ -1195,6 +1242,7 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     if (confirmed) {
       await TimelineStore.deleteTimeline(timelineId);
+      if (this.#periodsForm?.timelineId === timelineId) await this.#closePeriodsForm();
       if (this.#selectedTimelineId === timelineId) {
         this.#selectedTimelineId = null;
       }

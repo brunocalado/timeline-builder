@@ -1,3 +1,7 @@
+# Unreleased
+
+- [Added] Periods: group entries into named periods from the new Periods window in the Timeline Manager, with a per-timeline display setting (Off / Lane / Bands).
+
 # 0.1.3
 
 - Removed AI assets

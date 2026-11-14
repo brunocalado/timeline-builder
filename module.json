@@ -45,6 +45,9 @@
     },
     {
       "src": "styles/timeline-import-export.css"
+    },
+    {
+      "src": "styles/timeline-periods.css"
     }
   ],
   "packs": [

@@ -48,6 +48,9 @@
             <button type="button" class="icon-btn" data-action="sortTimeline" data-timeline-id="{{selectedTimeline.id}}" data-tooltip="Sort Timeline">
                 <i class="fa-solid fa-sort-amount-down"></i> Sort
             </button>
+            <button type="button" class="icon-btn" data-action="managePeriods" data-tooltip="Periods">
+                <i class="fa-solid fa-arrows-left-right"></i> Periods
+            </button>
             <button type="button" class="icon-btn" data-action="toggleVisibility" data-timeline-id="{{selectedTimeline.id}}"
                     style="{{#if selectedTimeline.visible}}color: #2ec4a0;{{else}}color: #ff6b6b;{{/if}}"
                     data-tooltip="{{#if selectedTimeline.visible}}Visible to Players (Click to Hide){{else}}Hidden from Players (Click to Show){{/if}}">

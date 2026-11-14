@@ -1,0 +1,52 @@
+<div class="periods-form">
+    <fieldset class="periods-display">
+        <legend>Display on this timeline</legend>
+        <div class="periods-display-options">
+            {{#each displayOptions}}
+            <label class="periods-display-option {{#if checked}}active{{/if}}" data-tooltip="{{hint}}">
+                <input type="radio" name="periodDisplay" value="{{value}}" {{#if checked}}checked{{/if}}>
+                <i class="{{icon}}"></i> {{label}}
+            </label>
+            {{/each}}
+        </div>
+    </fieldset>
+
+    <ul class="periods-list">
+        {{#each periods}}
+        <li class="periods-row status-{{status}}" data-period-id="{{id}}">
+            <div class="periods-row-fields">
+                <span class="periods-swatch" style="--period-color: {{swatch}};"></span>
+                <select class="tl-combobox periods-color" data-field="color" data-tooltip="Color">
+                    {{selectOptions colorOptions selected=color}}
+                </select>
+                <input type="text" class="periods-name" data-field="name" value="{{name}}" maxlength="{{../maxName}}" placeholder="Period name">
+                <button type="button" class="periods-delete" data-action="deletePeriod" data-period-id="{{id}}" data-tooltip="Delete period">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+            <div class="periods-row-anchors">
+                <label>From
+                    <select class="tl-combobox" data-field="startEntryId">
+                        {{selectOptions ../entryOptions selected=startEntryId blank="— pick an entry —"}}
+                    </select>
+                </label>
+                <label>To
+                    <select class="tl-combobox" data-field="endEntryId">
+                        {{selectOptions ../entryOptions selected=endEntryId blank="— pick an entry —"}}
+                    </select>
+                </label>
+            </div>
+            {{#if statusText}}<p class="periods-status"><i class="fa-solid fa-triangle-exclamation"></i> {{statusText}}</p>{{/if}}
+        </li>
+        {{else}}
+        <li class="periods-empty">No periods yet.</li>
+        {{/each}}
+    </ul>
+
+    <div class="periods-footer">
+        <button type="button" class="tl-action-btn" data-action="addPeriod" {{#unless canAdd}}disabled{{/unless}}>
+            <i class="fa-solid fa-plus"></i> Period
+        </button>
+        {{#unless canAdd}}<p class="periods-hint">Add an event to the timeline first.</p>{{/unless}}
+    </div>
+</div>

@@ -1,3 +1,11 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Timeline Builder - Entry Point
  * A module for creating and managing campaign timelines in Foundry VTT.
@@ -144,7 +152,8 @@ Hooks.once("init", () => {
     TEMPLATES.VIEWER,
     TEMPLATES.ENTRY,
     TEMPLATES.WELCOME,
-    TEMPLATES.IMPORT_EXPORT
+    TEMPLATES.IMPORT_EXPORT,
+    TEMPLATES.PERIODS
   ]);
 
   // Register Handlebars partials

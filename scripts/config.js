@@ -26,7 +26,8 @@ export const TEMPLATES = {
   VIEWER: `modules/${MODULE_ID}/templates/viewer.hbs`,
   ENTRY: `modules/${MODULE_ID}/templates/timeline-entry.hbs`,
   WELCOME: `modules/${MODULE_ID}/templates/welcome.hbs`,
-  IMPORT_EXPORT: `modules/${MODULE_ID}/templates/import-export.hbs`
+  IMPORT_EXPORT: `modules/${MODULE_ID}/templates/import-export.hbs`,
+  PERIODS: `modules/${MODULE_ID}/templates/periods.hbs`
 };
 
 export const DEFAULT_COLORS = [
