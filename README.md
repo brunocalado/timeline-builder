@@ -14,6 +14,7 @@
 - **🕵️ Mystery Mode**: Tease your players with "Redacted" information. Show that an event occurred but hide the specific date, description, or image until the big reveal.
 - **🔗 Deep Integration**: Connect events directly to **Journal Entries**. A single click transports players from the timeline to the full lore page.
 - **🏷️ Powerful Organization**: Use **Tags** to categorize events (e.g., "War", "Politics", "Personal") and let players filter the view to see exactly what matters to them.
+- **⏳ Periods**: Mark a war, a reign or an age as a span of events instead of a single point. You pick the event where it starts and the event where it ends, and the period follows those events when you reorder them. The viewer draws it as a colored bar above the line, PDF export marks it in the margin, and each timeline can switch periods off.
 - **👑 GM Control**: Manage what players see with granular visibility settings. Hide entire timelines or specific events, and use **Broadcast** to show a timeline to all connected players instantly.
 - **📄 PDF Export**: Turn any timeline into a clean, shareable document. Click the **PDF** button in the Manager to download a paginated file with every event's timeframe, title, description, tags, and images.
 - **📤 Import / Export**: Back up timelines or move them to another world. Open **Configure Settings → Import / Export** to export any selection of timelines as a JSON file, then import them elsewhere — id conflicts are detected automatically, letting you skip, replace, or import as a copy.
@@ -38,7 +39,7 @@ Timeline.Manage();
 
 <p align="center"><img width="600" src="docs/settings.webp"></p>
 
-3.  **Customize**: Pick your theme colors, line styles, and apply special effects to key moments.
+3.  **Customize**: Pick your theme colors, line styles, and apply special effects to key moments. To group events into periods, click **Periods** in the Manager's toolbar. The **Timeline Periods** window lists them, and its **Off** and **Lane** options choose whether they are drawn. Up to three periods can overlap on the same events. A fourth is not drawn, and the window marks it as not shown. A period that starts or ends on an event hidden from players is not shown to them.
 4.  **Share**: Players can open the viewer to explore the history you've created!
 
 ## 🚀 Installation
