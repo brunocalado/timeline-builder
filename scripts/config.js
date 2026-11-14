@@ -47,6 +47,7 @@ export const DEFAULT_COLORS = [
 export const PERIOD_DISPLAY = Object.freeze({ NONE: "none", LANE: "lane" });
 /** Used when a timeline has no `periodDisplay` stored. */
 export const DEFAULT_PERIOD_DISPLAY = PERIOD_DISPLAY.LANE;
-/** Periods that may overlap on one entry. Bounds the vertical space the viewer reserves. */
+/** Periods that may overlap on one entry. Bounds the vertical space the viewer reserves; four lanes
+ *  crowded the viewer's cards in review, so the cap is three and a fourth overlapping period is not drawn. */
 export const MAX_PERIOD_LANES = 3;
 export const MAX_PERIOD_NAME_LENGTH = 40;

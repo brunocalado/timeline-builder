@@ -12,6 +12,24 @@
  * A period is a named span of entries, anchored to two entry ids. This module is pure: it imports
  * only config.js and touches no Foundry global, so every surface (viewer, manager, PDF) resolves
  * periods the same way and a client can test it through a dynamic import().
+ *
+ * Why periods are stored this way (alternatives that were weighed and lost):
+ * - An "ends at" field on every entry: feature UI on every row for people who never use it, no way to
+ *   express overlap or a named era, and delete/reorder would have to keep per-entry fields consistent.
+ * - A "period" kind of entry (a wide card) in the same list: the viewer's zig-zag is a flat nth-child
+ *   pattern of fixed-width slots; a wide card breaks it and still cannot overlap another.
+ * - Anchoring to real dates: entries are evenly spaced and `period` is free text in most timelines,
+ *   so a date scale would be a different product. Anchoring to entry ids makes a period follow
+ *   drag-reorder, "Sort" and autoSort for free.
+ * - Deleting a period when an anchor entry is deleted: silent data loss. The anchor is cleared and
+ *   the Periods window flags the period instead.
+ * - The display mode as a per-player preference: the GM picks the look per timeline.
+ * - A "Bands" display (tinted backgrounds behind the covered entries) was built and dropped after
+ *   a visual review; only Off and Lane remain, and a stored "band" falls back to the default.
+ * - Lanes assigned separately by each surface (viewer, manager, PDF): the copies would drift, so
+ *   resolvePeriods below is the only place lanes are assigned.
+ * - Rendering the period DOM always and hiding it with CSS: it would cost layout for timelines that
+ *   use no periods, which must render exactly as before.
  */
 
 import { PERIOD_DISPLAY, DEFAULT_PERIOD_DISPLAY, MAX_PERIOD_LANES, MAX_PERIOD_NAME_LENGTH } from "./config.js";
