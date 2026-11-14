@@ -17,6 +17,7 @@ import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
 import { BaseCRUDForm } from "./forms/BaseCRUDForm.js";
 import { exportTimelineToPdf } from "./export-pdf.js";
 import { PeriodsForm } from "./forms/periods-form.js";
+import { resolvePeriods, periodMarksByEntry } from "./periods.js";
 
 const { DialogV2 } = foundry.applications.api;
 
@@ -221,6 +222,18 @@ export class TimelineManager extends BaseHandlebarsForm {
       await resolvePageNames(selectedTimeline.entries);
     }
 
+    // Period rails beside the rows. resolvePeriods returns nothing for display "none", so Off needs no
+    // branch; marks go on the copies made above, never on settings-owned entries.
+    let railLanes = 0;
+    if (selectedTimeline?.entries?.length) {
+      const { periods, laneCount } = resolvePeriods(selectedTimeline, selectedTimeline.entries);
+      if (laneCount) {
+        const marks = periodMarksByEntry(periods, selectedTimeline.entries.map(e => e.id));
+        for (const entry of selectedTimeline.entries) entry.periodMarks = marks.get(entry.id);
+        railLanes = laneCount;
+      }
+    }
+
     const sortedIcons = Object.fromEntries(
       Object.entries(ICON_OPTIONS).sort(([, a], [, b]) => a.localeCompare(b))
     );
@@ -230,7 +243,8 @@ export class TimelineManager extends BaseHandlebarsForm {
       timelines,
       selectedTimeline,
       hasTimelines: timelines.length > 0,
-      iconOptions: sortedIcons
+      iconOptions: sortedIcons,
+      railLanes
     };
   }
 
@@ -759,9 +773,11 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     if (this.#selectedTimelineId) {
       await TimelineStore.updateEntryOrder(this.#selectedTimelineId, orderedIds);
-      // The drop already moved the row, so the manager is not re-rendered; the Periods window's
-      // entry order and overlap statuses still follow the new order.
-      if (this.#periodsForm?.rendered) this.#periodsForm.render();
+      // Rails are computed from the stored order; the live drag reordered rows only in the DOM.
+      // render() also refreshes the Periods window. Without rails the drop keeps today's
+      // no-render behaviour, and only the open Periods window (order, overlap statuses) is refreshed.
+      if (this.element.querySelector(".period-rail")) this.render();
+      else if (this.#periodsForm?.rendered) this.#periodsForm.render();
     }
   }
 

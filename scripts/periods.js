@@ -105,3 +105,23 @@ export function sanitizePeriods(timeline) {
   }
   return clean;
 }
+
+/**
+ * For each entry id, the periods that cover it as rail marks.
+ * @param {object[]} periods  The `periods` array returned by resolvePeriods (any status).
+ * @param {string[]} entryIds Display order.
+ * @returns {Map<string, Array<{lane: number, color: string, name: string, role: "only"|"start"|"mid"|"end"}>>}
+ *   Only `status === "ok"` periods produce marks. Marks are sorted by lane.
+ */
+export function periodMarksByEntry(periods, entryIds) {
+  const marks = new Map(entryIds.map((id) => [id, []]));
+  for (const p of periods) {
+    if (p.status !== "ok") continue;
+    p.entryIds.forEach((id, i) => {
+      const role = p.entryIds.length === 1 ? "only" : i === 0 ? "start" : i === p.entryIds.length - 1 ? "end" : "mid";
+      marks.get(id)?.push({ lane: p.lane, color: p.color, name: p.name, role });
+    });
+  }
+  for (const list of marks.values()) list.sort((a, b) => a.lane - b.lane);
+  return marks;
+}

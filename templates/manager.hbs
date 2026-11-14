@@ -82,7 +82,7 @@
     </header>
 
     <!-- Event List -->
-    <section class="entry-list-container {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}}" {{#if selectedTimeline.dotSize}}style="--tl-dot-size: {{selectedTimeline.dotSize}}px;"{{/if}}>
+    <section class="entry-list-container {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}} {{#if railLanes}}has-period-rails{{/if}}" {{#if (or selectedTimeline.dotSize railLanes)}}style="{{#if selectedTimeline.dotSize}}--tl-dot-size: {{selectedTimeline.dotSize}}px;{{/if}}{{#if railLanes}} --rail-lanes: {{railLanes}};{{/if}}"{{/if}}>
 
       <!-- Search Bar -->
       <div class="manager-search-row">
@@ -101,6 +101,13 @@
       <div class="entry-list">
         {{#each selectedTimeline.entries}}
         <article class="timeline-entry {{#if this.hidden}}entry-hidden{{/if}}" data-entry-id="{{this.id}}" data-period="{{this.period}}" data-name="{{this.name}}" data-description="{{this.description}}" draggable="true">
+          {{#if ../railLanes}}
+          <div class="period-rail" aria-hidden="true">
+            {{#each this.periodMarks}}
+            <span class="rail-seg rail-{{role}}" style="--lane: {{lane}}; --rail-color: {{color}};" data-tooltip="{{name}}"></span>
+            {{/each}}
+          </div>
+          {{/if}}
           
           <!-- COLUMN 1: Time -->
           <div class="entry-col-time">

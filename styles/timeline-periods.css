@@ -233,3 +233,62 @@
   color: var(--tl-text-muted);
   font-size: 0.85rem;
 }
+
+/* ---------- Period rails in the Timeline Manager entry list ---------- */
+
+/* Rows grow a left gutter wide enough for every rail lane. */
+.timeline-builder .has-period-rails .timeline-entry {
+  position: relative;
+  padding-left: calc(var(--rail-lanes) * 8px + 8px);
+}
+
+/* A hidden row is dimmed and greyed with opacity/filter, which would also grey its rail segments and
+   break the period's colour mid-rail. Dim the row's content instead and leave the rail alone. */
+.timeline-builder .has-period-rails .timeline-entry.entry-hidden {
+  opacity: 1;
+  filter: none;
+}
+
+.timeline-builder .has-period-rails .timeline-entry.entry-hidden > :not(.period-rail) {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+/* The guide line follows the time column, which moved right by the extra gutter (8px per lane + 4px). */
+.timeline-builder .has-period-rails .entry-list::before {
+  left: calc(var(--tl-time-width) - 1px + var(--rail-lanes) * 8px + 4px);
+}
+
+.timeline-builder .period-rail {
+  position: absolute;
+  inset: 0 auto 0 4px;
+  width: calc(var(--rail-lanes) * 8px);
+  pointer-events: none;
+}
+
+/* A segment reaches 5px past its row (1px border + half the 8px row gap), so the segments of
+   consecutive rows meet and a period reads as one continuous rail. */
+.timeline-builder .rail-seg {
+  position: absolute;
+  left: calc(var(--lane) * 8px);
+  top: -5px;
+  bottom: -5px;
+  width: 4px;
+  background: var(--rail-color);
+  /* Only for the name tooltip; dragging and editing stay on the row. */
+  pointer-events: auto;
+}
+
+.timeline-builder .rail-start,
+.timeline-builder .rail-only {
+  top: 6px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.timeline-builder .rail-end,
+.timeline-builder .rail-only {
+  bottom: 6px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
