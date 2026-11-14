@@ -20,8 +20,7 @@ import { BaseHandlebarsForm } from "./BaseHandlebarsForm.js";
 
 const DISPLAY_OPTIONS = [
   { value: "none", label: "Off", icon: "fa-solid fa-eye-slash", hint: "Periods are hidden everywhere but this window. Nothing is deleted." },
-  { value: "lane", label: "Lane", icon: "fa-solid fa-bars-staggered", hint: "Bars in a lane above the timeline. Periods may overlap." },
-  { value: "band", label: "Bands", icon: "fa-solid fa-object-group", hint: "Tinted bands behind the events. Overlapping periods nest." }
+  { value: "lane", label: "Lane", icon: "fa-solid fa-bars-staggered", hint: "Bars in a lane above the timeline. Periods may overlap." }
 ];
 
 export class PeriodsForm extends BaseHandlebarsForm {
