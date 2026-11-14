@@ -1,3 +1,11 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Timeline Builder - Configuration Constants
  */
@@ -33,3 +41,11 @@ export const DEFAULT_COLORS = [
   { id: "violet", label: "Violet", value: "#8000FF" },
   { id: "magenta", label: "Magenta", value: "#FF00FF" }
 ];
+
+/** How a timeline draws its periods. */
+export const PERIOD_DISPLAY = Object.freeze({ NONE: "none", LANE: "lane", BAND: "band" });
+/** Used when a timeline has no `periodDisplay` stored. */
+export const DEFAULT_PERIOD_DISPLAY = PERIOD_DISPLAY.LANE;
+/** Periods that may overlap on one entry. Bounds the vertical space the viewer reserves. */
+export const MAX_PERIOD_LANES = 4;
+export const MAX_PERIOD_NAME_LENGTH = 40;

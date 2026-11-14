@@ -1,8 +1,17 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Timeline Builder - Data Abstraction Layer
  */
 
 import { MODULE_ID, SETTINGS } from "./config.js";
+import { sanitizePeriods, getPeriodDisplay } from "./periods.js";
 
 /**
  * Static class to centralize data manipulation for timelines.
@@ -138,6 +147,13 @@ export class TimelineStore {
             timelinesChanged = true;
           }
         });
+
+        for (const period of t.periods ?? []) {
+          if (period.color && period.color.toLowerCase() === lowerOldValue) {
+            period.color = newValue;
+            timelinesChanged = true;
+          }
+        }
       });
       if (timelinesChanged) {
         await game.settings.set(MODULE_ID, SETTINGS.DATA, timelines);
@@ -336,10 +352,78 @@ export class TimelineStore {
     if (timeline.entries.length < initialLength) {
       // Re-sort entries
       timeline.entries.forEach((e, i) => e.sort = i);
+      // Clear, never delete: the period keeps its name/color and the editor flags it for repair.
+      for (const period of timeline.periods ?? []) {
+        if (period.startEntryId === entryId) period.startEntryId = "";
+        if (period.endEntryId === entryId) period.endEntryId = "";
+      }
       await game.settings.set(MODULE_ID, SETTINGS.DATA, timelines);
       return true;
     }
     return false;
+  }
+
+  /**
+   * Add a period to a timeline. Both anchors default to the first entry.
+   * @param {string} timelineId - Timeline ID.
+   * @param {Object} [data] - name | startEntryId | endEntryId | color.
+   * @returns {Promise<Object|null>} The created period, or null if the timeline has no entries.
+   */
+  static async createPeriod(timelineId, data = {}) {
+    const timelines = this.getTimelines();
+    const timeline = timelines.find(t => t.id === timelineId);
+    if (!timeline?.entries.length) return null; // a period needs an entry to anchor to
+
+    const first = timeline.entries[0].id;
+    const period = {
+      id: foundry.utils.randomID(),
+      name: data.name || "New Period",
+      startEntryId: data.startEntryId ?? first,
+      endEntryId: data.endEntryId ?? first,
+      color: data.color ?? ""
+    };
+    (timeline.periods ??= []).push(period);
+    await game.settings.set(MODULE_ID, SETTINGS.DATA, timelines);
+    return period;
+  }
+
+  /**
+   * Update a period's name, anchors or color. Other keys in `data` are ignored.
+   * @param {string} timelineId - Timeline ID.
+   * @param {string} periodId - Period ID.
+   * @param {Object} data - name | startEntryId | endEntryId | color.
+   * @returns {Promise<Object|null>} The updated period or null.
+   */
+  static async updatePeriod(timelineId, periodId, data) {
+    const timelines = this.getTimelines();
+    const timeline = timelines.find(t => t.id === timelineId);
+    const period = timeline?.periods?.find(p => p.id === periodId);
+    if (!period) return null;
+
+    for (const key of ["name", "startEntryId", "endEntryId", "color"]) {
+      if (key in data) period[key] = data[key];
+    }
+    await game.settings.set(MODULE_ID, SETTINGS.DATA, timelines);
+    return period;
+  }
+
+  /**
+   * Delete a period from a timeline.
+   * @param {string} timelineId - Timeline ID.
+   * @param {string} periodId - Period ID.
+   * @returns {Promise<boolean>} True if deleted.
+   */
+  static async deletePeriod(timelineId, periodId) {
+    const timelines = this.getTimelines();
+    const timeline = timelines.find(t => t.id === timelineId);
+    if (!timeline?.periods) return false;
+
+    const initialLength = timeline.periods.length;
+    timeline.periods = timeline.periods.filter(p => p.id !== periodId);
+    if (timeline.periods.length === initialLength) return false;
+
+    await game.settings.set(MODULE_ID, SETTINGS.DATA, timelines);
+    return true;
   }
 
   /**
@@ -354,6 +438,8 @@ export class TimelineStore {
 
     for (const { timeline, resolution } of items) {
       const clone = foundry.utils.deepClone(timeline);
+      if (clone.periods !== undefined) clone.periods = sanitizePeriods(clone);
+      if (clone.periodDisplay !== undefined) clone.periodDisplay = getPeriodDisplay(clone);
       const conflicts = timelines.some(t => t.id === clone.id);
 
       if (resolution === "replace" && conflicts) {
