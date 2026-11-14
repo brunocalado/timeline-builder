@@ -4,6 +4,7 @@
 - [Added] The Timeline Manager entry list shows colored rails for the periods an entry belongs to.
 - [Added] Viewer: periods drawn as bars in a lane above the timeline (Lane display).
 - [Added] PDF export marks periods with colored bars in the margin and a caption at their first entry.
+- [Removed] The Macros compendium. Open the timeline from the Timeline button in the Notes controls, or call `Timeline.Open()` and `Timeline.Manage()` from a macro of your own.
 
 # 0.1.3
 

@@ -52,18 +52,6 @@
   ],
   "packs": [
     {
-      "label": "Macros",
-      "type": "Macro",
-      "name": "macros",
-      "path": "packs/macros",
-      "ownership": {
-        "PLAYER": "NONE",
-        "ASSISTANT": "OWNER"
-      },
-      "flags": {},
-      "banner": "modules/timeline-builder/assets/images/banner.webp"
-    },
-    {
       "label": "Instructions",
       "type": "JournalEntry",
       "name": "journal",
@@ -82,8 +70,7 @@
       "sorting": "a",
       "color": "#3e0a66",
       "packs": [
-        "journal",
-        "macros"
+        "journal"
       ],
       "folders": []
     }
