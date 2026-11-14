@@ -1,3 +1,11 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /* ===========================
    VIEWER VIEW (HORIZONTAL PLAYER)
    =========================== */
@@ -923,4 +931,91 @@
     margin-right: 5px;
     opacity: 0.8;
     color: #ffffff;
+}
+
+/* ===========================
+   PERIODS — LANE
+   =========================== */
+
+/* The strip: reserve its height at the top of the track, and move the line to the centre of what is
+   left (the entries are flex-centred in the track's content box, which the padding shrinks). */
+.timeline-builder .timeline-track.has-periods {
+  --tl-lane-h: calc(var(--tl-lane-count) * var(--tl-lane-row) + var(--tl-lane-pad));
+  padding-top: var(--tl-lane-h);
+}
+.timeline-builder .timeline-track.has-periods .track-line {
+  top: calc(50% + var(--tl-lane-h) / 2);
+}
+/* Cards above the line must still clear the strip. `cqh` is the scroll area's content height. */
+.timeline-builder .timeline-track.has-periods .card-box {
+  max-height: min(240px, calc((100cqh - var(--tl-lane-h)) / 2 - var(--tl-stem-height) - 12px));
+}
+
+.timeline-builder .period-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.timeline-builder .period-item[hidden] {
+  display: none;
+}
+
+.timeline-builder .period-item {
+  position: absolute;
+  top: calc(var(--lane) * var(--tl-lane-row) + var(--tl-lane-pad) / 2);
+  bottom: calc(50% - var(--tl-lane-h) / 2);   /* ends on the line */
+  border-inline: 1px dashed color-mix(in srgb, var(--period-color) 60%, transparent);
+}
+
+/* `overflow: clip`, not `hidden`: hidden would make the bar a scroll container and pin the sticky
+   label to the bar instead of the viewer's scroll area. Clip still cuts a label wider than the bar. */
+.timeline-builder .period-bar {
+  height: calc(var(--tl-lane-row) - 8px);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: color-mix(in srgb, var(--period-color) 22%, #151515);
+  border: 1px solid var(--period-color);
+  border-radius: 6px;
+  overflow: clip;
+  pointer-events: auto;
+  font-size: 12px;
+  color: var(--tl-text);
+}
+
+/* Name and range slide together, so a long bar keeps its label in view while scrolling; 48px clears
+   the floating filter buttons on the left edge. */
+.timeline-builder .period-label {
+  position: sticky;
+  left: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeline-builder .period-name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.timeline-builder .period-range {
+  font-family: monospace;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* The stretch on the line runs from the first dot to the last (10px past each, so a one-entry period
+   still marks its dot); the bar above spans the cards. Overlapping periods stack as stripes in lane
+   order, centred on the line, instead of painting over each other. */
+.timeline-builder .period-seg {
+  position: absolute;
+  left: calc(var(--tl-card-width) / 2 - 10px);
+  right: calc(var(--tl-card-width) / 2 - 10px);
+  bottom: 0;
+  height: calc(var(--tl-line-width, 2px) + 2px);
+  transform: translateY(calc((0.5 + var(--lane) - (var(--tl-lane-count) - 1) / 2) * 100%));
+  border-radius: 2px;
+  background: var(--period-color);
 }

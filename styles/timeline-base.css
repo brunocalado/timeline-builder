@@ -1,3 +1,11 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /* ===========================
    Variables & Theme
    =========================== */
@@ -27,6 +35,8 @@
   --tl-card-width: 300px;
   --tl-track-height: 2px;
   --tl-stem-height: 30px;
+  --tl-lane-row: 34px;   /* height of one period lane, bar + gap */
+  --tl-lane-pad: 12px;   /* breathing room between the period strip and the cards */
 }
 
 /* Basic reset for Foundry windows */

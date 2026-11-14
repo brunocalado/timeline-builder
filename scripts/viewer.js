@@ -1,9 +1,18 @@
+/*!
+ * ⏳ Timeline Builder
+ * 2026 https://github.com/brunocalado
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3.
+ */
+
 /**
  * Timeline Builder - Viewer Application (Players/GM)
  */
 
-import { TEMPLATES, MODULE_ID, SETTINGS } from "./config.js";
+import { TEMPLATES, MODULE_ID, SETTINGS, PERIOD_DISPLAY } from "./config.js";
 import { getGlassStyle, resolveEntryDisplayProps, resolvePageNames } from "./helpers.js";
+import { getPeriodDisplay, resolvePeriods } from "./periods.js";
 import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
 
 /**
@@ -152,6 +161,16 @@ export class TimelineViewer extends BaseHandlebarsForm {
     // 6. Resolve page names for entries with linked pages
     await resolvePageNames(entries);
 
+    // Periods resolve against what THIS viewer can see: a hidden anchor makes the period incomplete and
+    // undrawn, so a player never learns of a hidden entry through a period (and a masked timeframe
+    // reads "???"). `entries` is the sorted, permission-filtered, masked list; viewTimeline.entries is not yet.
+    let periodLayer = null;
+    if (viewTimeline && getPeriodDisplay(viewTimeline) === PERIOD_DISPLAY.LANE) {
+      const { periods, laneCount } = resolvePeriods(viewTimeline, entries);
+      const items = periods.filter((p) => p.status === "ok");
+      if (items.length) periodLayer = { laneCount, items };
+    }
+
     if (viewTimeline) {
       viewTimeline.entries = entries;
     }
@@ -163,7 +182,8 @@ export class TimelineViewer extends BaseHandlebarsForm {
       hasTimelines: timelines.length > 0,
       allTags,
       hasActiveFilters: this.#activeFilters.size > 0,
-      textFilter: this.#textFilter
+      textFilter: this.#textFilter,
+      periodLayer
     };
   }
 
@@ -184,6 +204,7 @@ export class TimelineViewer extends BaseHandlebarsForm {
       if (date) entry.classList.add("has-date");
       if (img) entry.classList.add("has-image");
     });
+    this.#layoutPeriods();
 
     // Setup Live Text Filter
     const searchInput = this.element.querySelector('.filter-search-input');
@@ -312,6 +333,28 @@ export class TimelineViewer extends BaseHandlebarsForm {
         entry.classList.add('filtered-out');
       }
     });
+    this.#layoutPeriods();
+  }
+
+  /**
+   * Position each period bar over the entries it covers that are currently shown. Not pure CSS:
+   * `.filtered-out` is `display: none`, which takes entries out of the flow and moves every later one.
+   * A filtered-out anchor clamps the bar to the nearest shown member; no member shown hides it.
+   */
+  #layoutPeriods() {
+    const track = this.element.querySelector(".timeline-track.has-periods");
+    if (!track) return;
+    const byId = new Map([...track.querySelectorAll(".h-entry")].map((el) => [el.dataset.entryId, el]));
+    for (const item of track.querySelectorAll(".period-item")) {
+      const shown = item.dataset.entryIds.split(",").map((id) => byId.get(id))
+        .filter((el) => el && !el.classList.contains("filtered-out"));
+      item.hidden = shown.length === 0;
+      if (!shown.length) continue;
+      const first = shown[0], last = shown.at(-1);
+      // offsetLeft is relative to the track (position: relative), the entries' offset parent.
+      item.style.left = `${first.offsetLeft}px`;
+      item.style.width = `${last.offsetLeft + last.offsetWidth - first.offsetLeft}px`;
+    }
   }
 
   /**

@@ -70,7 +70,7 @@
   <div class="timeline-scroll-area" id="timelineScrollContainer" style="{{#if selectedTimeline.backgroundImage}}background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px), url('{{selectedTimeline.backgroundImage}}'); background-size: 20px 20px, cover; background-position: 0 0, center;{{/if}}">
     {{#if selectedTimeline}}
       {{#if selectedTimeline.entries.length}}
-      <div class="timeline-track {{#if (eq selectedTimeline.lineStyle 'dashed')}}track-style-dashed{{/if}} {{#if (eq selectedTimeline.lineStyle 'rough')}}track-style-rough{{/if}} {{#if (eq selectedTimeline.lineEffect 'pulse')}}track-effect-pulse{{/if}} {{#if (eq selectedTimeline.lineEffect 'glitch')}}track-effect-glitch{{/if}} {{#if (eq selectedTimeline.lineEffect 'neon')}}track-effect-neon{{/if}} {{#if (eq selectedTimeline.lineEffect 'chroma')}}track-effect-chroma{{/if}} {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}}" style="margin-top: 0; margin-bottom: 0; {{#if selectedTimeline.lineWidth}}--tl-line-width: {{selectedTimeline.lineWidth}}px;{{/if}}{{#if selectedTimeline.lineColor}}--tl-line-color: {{selectedTimeline.lineColor}};{{/if}}{{#if selectedTimeline.dotSize}}--tl-dot-size: {{selectedTimeline.dotSize}}px;{{/if}}">
+      <div class="timeline-track {{#if (eq selectedTimeline.lineStyle 'dashed')}}track-style-dashed{{/if}} {{#if (eq selectedTimeline.lineStyle 'rough')}}track-style-rough{{/if}} {{#if (eq selectedTimeline.lineEffect 'pulse')}}track-effect-pulse{{/if}} {{#if (eq selectedTimeline.lineEffect 'glitch')}}track-effect-glitch{{/if}} {{#if (eq selectedTimeline.lineEffect 'neon')}}track-effect-neon{{/if}} {{#if (eq selectedTimeline.lineEffect 'chroma')}}track-effect-chroma{{/if}} {{#if (ne selectedTimeline.dotShape 'default')}}dot-shape-{{selectedTimeline.dotShape}}{{/if}} {{#if periodLayer}}has-periods{{/if}}" style="margin-top: 0; margin-bottom: 0; {{#if selectedTimeline.lineWidth}}--tl-line-width: {{selectedTimeline.lineWidth}}px;{{/if}}{{#if selectedTimeline.lineColor}}--tl-line-color: {{selectedTimeline.lineColor}};{{/if}}{{#if selectedTimeline.dotSize}}--tl-dot-size: {{selectedTimeline.dotSize}}px;{{/if}}{{#if periodLayer}}--tl-lane-count: {{periodLayer.laneCount}};{{/if}}">
         <!-- The central line -->
         <div class="track-line {{#if (eq selectedTimeline.lineStyle 'dashed')}}line-style-dashed{{/if}} {{#if (eq selectedTimeline.lineStyle 'rough')}}line-style-rough{{/if}} {{#if (eq selectedTimeline.lineEffect 'flow')}}line-effect-flow{{/if}} {{#if (eq selectedTimeline.lineEffect 'pulse')}}line-effect-pulse{{/if}} {{#if (eq selectedTimeline.lineEffect 'glitch')}}line-effect-glitch{{/if}} {{#if (eq selectedTimeline.lineEffect 'neon')}}line-effect-neon{{/if}} {{#if (eq selectedTimeline.lineEffect 'chroma')}}line-effect-chroma{{/if}}"
              ></div>
@@ -79,6 +79,7 @@
         <!-- Entry Block -->
         <div class="h-entry {{#if this.hidden}}hidden-entry{{/if}} {{#if this.hasMystery}}mystery-entry{{/if}} {{#if this.displayEffect}}effect-{{this.displayEffect}}{{/if}} {{#if this.isFilteredOut}}filtered-out{{/if}}"
              style="{{#if this.displayColor}}--entry-color: {{this.displayColor}};{{/if}}{{#if this.displayEffectColor}}--effect-color: {{this.displayEffectColor}};{{/if}}"
+             data-entry-id="{{this.id}}"
              data-period="{{this.period}}"
              data-tag-ids="{{this.tagIds}}">
 
@@ -146,6 +147,24 @@
           {{/if}}
         </div>
         {{/each}}
+
+        {{!-- Periods: the last child of the track, so the entries' nth-child zig-zag is unchanged. --}}
+        {{#if periodLayer}}
+        <div class="period-layer">
+          {{#each periodLayer.items}}
+          <div class="period-item" style="--lane: {{lane}}; --period-color: {{color}};"
+               data-entry-ids="{{entryIds}}" title="{{name}}{{#if label}} · {{label}}{{/if}}">
+            <div class="period-bar">
+              <span class="period-label">
+                <span class="period-name">{{name}}</span>
+                {{#if label}}<span class="period-range">{{label}}</span>{{/if}}
+              </span>
+            </div>
+            <span class="period-seg"></span>
+          </div>
+          {{/each}}
+        </div>
+        {{/if}}
       </div>
       {{else}}
         <p class="no-entries">This timeline is empty.</p>

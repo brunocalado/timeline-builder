@@ -2,6 +2,7 @@
 
 - [Added] Periods: group entries into named periods from the new Periods window in the Timeline Manager, with a per-timeline display setting (Off / Lane / Bands).
 - [Added] The Timeline Manager entry list shows colored rails for the periods an entry belongs to.
+- [Added] Viewer: periods drawn as bars in a lane above the timeline (Lane display).
 
 # 0.1.3
 
