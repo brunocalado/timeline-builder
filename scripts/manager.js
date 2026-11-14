@@ -1084,10 +1084,13 @@ export class TimelineManager extends BaseHandlebarsForm {
 
     // Resolve tag ids to { label, color } for the PDF pills.
     const tagMap = new Map(this._getTags().map(t => [t.id, t]));
+    // Periods resolve against the same sorted array the entries come from, so start/end index into it.
+    // The export is the GM's, hidden entries included. En dash, not "→": the PDF writer is CP1252.
+    const sorted = [...timeline.entries].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+    const { periods } = resolvePeriods(timeline, sorted, { separator: " – " });   // [] when display is Off
     const model = {
       name: timeline.name || "Timeline",
-      entries: [...timeline.entries]
-        .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+      entries: sorted
         .map(e => ({
           period: e.period || "",
           name: e.name || "",
@@ -1098,7 +1101,9 @@ export class TimelineManager extends BaseHandlebarsForm {
             .map(t => ({ label: t.label, color: t.color })),
           img: e.img || "",
           color: e.color || timeline.defaultColor || ""
-        }))
+        })),
+      periods: periods.filter((p) => p.status === "ok")
+        .map(({ name, color, lane, start, end, label }) => ({ name, color, lane, start, end, label }))
     };
 
     // Guard against double-clicks while images load and the PDF is generated.

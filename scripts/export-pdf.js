@@ -30,6 +30,11 @@ const CONTENT_X = MARGIN + 30;      // Left edge of the entry content column.
 const CONTENT_RIGHT = PAGE_W - MARGIN;
 const CONTENT_W = CONTENT_RIGHT - CONTENT_X;
 
+// Period bars sit in the left margin, lane 0 nearest the rail; lane n is PERIOD_LANE_STEP further left.
+const PERIOD_BAR_X = MARGIN - 10;
+const PERIOD_LANE_STEP = 7;
+const PERIOD_BAR_W = 3.5;
+
 // Document palette (light theme, readable on a white page).
 const COLOR_TITLE = [0.10, 0.10, 0.10];
 const COLOR_NAME = [0.10, 0.10, 0.10];
@@ -165,6 +170,15 @@ function hexToRgb(hex, fallback) {
  */
 function luminance([r, g, b]) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * A darker tone of a colour, for period captions: light period colours (yellow) vanish on white paper.
+ * @param {number[]} rgb - `[r, g, b]` in 0..1.
+ * @returns {number[]}
+ */
+function darken(rgb) {
+  return rgb.map((c) => c * 0.65);
 }
 
 /**
@@ -314,8 +328,13 @@ class Page {
  * to PDF's bottom-left origin on emit.
  */
 class TimelineLayout {
+  /** Period index -> { page, top } for period bars still running. */
+  #openSegs = new Map();
+  /** Finished bar pieces, one per period per page: { page, top, bottom, color, lane }. */
+  #segments = [];
+
   /**
-   * @param {{name: string, entries: object[]}} model - Timeline export model.
+   * @param {{name: string, entries: object[], periods: object[]}} model - Timeline export model.
    * @param {Map<string, {name: string, width: number, height: number}>} imageMap
    *   Map from image src to its embedded XObject name and pixel dimensions.
    */
@@ -373,10 +392,11 @@ class TimelineLayout {
    * @param {number} w - Width.
    * @param {number} h - Height.
    * @param {number[]} color - Fill `[r,g,b]`.
+   * @param {Page} [page] - Page to draw on; period bars are drawn after layout, onto earlier pages.
    */
-  #rect(x, yTop, w, h, color) {
+  #rect(x, yTop, w, h, color, page = this.page) {
     const yBottom = this.#pdfY(yTop + h);
-    this.page.ops.push(
+    page.ops.push(
       `${color[0].toFixed(3)} ${color[1].toFixed(3)} ${color[2].toFixed(3)} rg`,
       `${x.toFixed(2)} ${yBottom.toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re f`
     );
@@ -477,7 +497,25 @@ class TimelineLayout {
   #ensureSpace(needed) {
     if (this.y + needed <= PAGE_H - MARGIN) return;
     this.page.railBottom = this.y;
+    // A running period bar ends at this page's last used y and resumes at the next page's top.
+    const running = [...this.#openSegs.keys()];
+    for (const p of running) this.#closePeriod(p, this.y);
     this.#newPage(MARGIN);
+    for (const p of running) this.#openPeriod(p, MARGIN);
+  }
+
+  /** Start a bar piece for period `p` on the current page. */
+  #openPeriod(p, top) {
+    this.#openSegs.set(p, { page: this.page, top });
+  }
+
+  /** Finish period `p`'s bar piece on the page it was opened on. */
+  #closePeriod(p, bottom) {
+    const seg = this.#openSegs.get(p);
+    if (!seg) return;
+    const { color, lane } = this.model.periods[p];
+    this.#segments.push({ page: seg.page, top: seg.top, bottom, color, lane });
+    this.#openSegs.delete(p);
   }
 
   /**
@@ -490,23 +528,47 @@ class TimelineLayout {
       this.page.railBottom = this.page.railTop;
       return;
     }
-    for (const entry of this.model.entries) this.#drawEntry(entry);
+    this.model.entries.forEach((entry, index) => this.#drawEntry(entry, index));
     this.page.railBottom = this.y;
+
+    // Every period closes at its last entry; this only guards against a stale index.
+    for (const p of [...this.#openSegs.keys()]) this.#closePeriod(p, this.y);
+    for (const s of this.#segments) {
+      const x = PERIOD_BAR_X - s.lane * PERIOD_LANE_STEP;
+      this.#rect(x, s.top, PERIOD_BAR_W, s.bottom - s.top, hexToRgb(s.color, COLOR_ACCENT), s.page);
+    }
   }
 
   /**
    * Lay out a single timeline entry (dot, timeframe, name, description, tags, image).
    * @param {object} entry - Prepared entry snapshot.
+   * @param {number} index - Position in `model.entries`, which period `start`/`end` refer to.
    */
-  #drawEntry(entry) {
+  #drawEntry(entry, index) {
     const dotColor = hexToRgb(entry.color, COLOR_ACCENT);
 
-    // Reserve room for at least the dot + timeframe + name so an entry never
-    // starts orphaned at the very bottom of a page.
-    this.#ensureSpace(48);
+    // Captions (name and range) of the periods that start here, printed above the entry.
+    const starting = this.model.periods.map((p, i) => [p, i]).filter(([p]) => p.start === index);
+    const captions = starting.map(([p]) => ({
+      p, lines: wrapText(p.label ? `${p.name}  (${p.label})` : p.name, 8, true, CONTENT_W)
+    }));
+    const captionH = captions.reduce((h, c) => h + c.lines.length * 11, 0);
+
+    // Reserve room for at least the captions + dot + timeframe + name so an entry never
+    // starts orphaned at the very bottom of a page (nor a caption without its entry).
+    this.#ensureSpace(48 + captionH);
 
     const entryTop = this.y;
-    this.#circle(RAIL_X, entryTop + 5, 3.6, dotColor);
+    starting.forEach(([, i]) => this.#openPeriod(i, entryTop));   // the bar starts at the caption
+    for (const { p, lines } of captions) {
+      for (const line of lines) {
+        this.#text(line, CONTENT_X, 8, { bold: true, color: darken(hexToRgb(p.color, COLOR_ACCENT)) });
+        this.y += 11;
+      }
+    }
+
+    const dotTop = this.y;
+    this.#circle(RAIL_X, dotTop + 5, 3.6, dotColor);
     this.page.railBottom = this.y;
 
     // Timeframe
@@ -545,6 +607,7 @@ class TimelineLayout {
       this.#drawImage(meta);
     }
 
+    this.model.periods.forEach((p, i) => { if (p.end === index) this.#closePeriod(i, this.y); });
     this.y += 16; // Gap between entries.
     this.page.railBottom = this.y;
   }
@@ -698,7 +761,7 @@ class PdfWriter {
 /**
  * Build the complete PDF byte array for a timeline model, embedding any loaded
  * images.
- * @param {{name: string, entries: object[]}} model - Timeline export model.
+ * @param {{name: string, entries: object[], periods: object[]}} model - Timeline export model.
  * @param {Map<string, {bytes: Uint8Array, width: number, height: number}>} images
  *   Map from image src to decoded JPEG data.
  * @returns {Uint8Array} The complete PDF file bytes.
@@ -814,6 +877,8 @@ function safeFilename(name) {
  * @param {Array<{period: string, name: string, description: string,
  *   tags: {label: string, color: string}[], img: string, color: string}>} model.entries
  *   Entries already filtered/masked for the current viewer.
+ * @param {Array<{name: string, color: string, lane: number, start: number, end: number, label: string}>} model.periods
+ *   Drawable periods; `start`/`end` index `model.entries`. Empty when there are none or display is Off.
  * @returns {Promise<void>}
  */
 export async function exportTimelineToPdf(model) {
