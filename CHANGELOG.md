@@ -5,6 +5,7 @@
 - [Added] Viewer: periods drawn as bars in a lane above the timeline (Lane display).
 - [Added] PDF export marks periods with colored bars in the margin and a caption at their first entry.
 - [Removed] The Macros compendium. Open the timeline from the Timeline button in the Notes controls, or call `Timeline.Open()` and `Timeline.Manage()` from a macro of your own.
+- [Added] An Instructions button in Configure Settings opens the module's instructions, now including periods.
 
 # 0.1.3
 

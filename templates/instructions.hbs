@@ -1,0 +1,75 @@
+<div class="instructions-container">
+  <h2>Welcome to ⏳ Timeline Builder!</h2>
+  <p>Thank you for installing Timeline Builder. This module is designed to help you create immersive, interactive, and visually distinct timelines for your campaigns.</p>
+  <p>Here is everything you need to know to get started:</p>
+
+  <section>
+    <h3>1. GM vs. Player Access</h3>
+    <ul>
+      <li><strong>Timeline Manager (GM Only):</strong> Only you can create, edit, and delete timelines. Open it with the <strong>Timeline</strong> (clock) button in the Notes scene controls, or with the <strong>Timeline Manager</strong> button in the Journal Directory. A macro of your own can also call <code>Timeline.Manage()</code>.</li>
+      <li><strong>Timeline Viewer (Everyone):</strong> Players can only view timelines. They can filter events by tags and open linked journal pages, but they cannot edit anything. The viewer opens with the <strong>Open Timeline</strong> button in the Journal Directory, the <strong>Timeline</strong> button in the Notes scene controls, or a macro calling <code>Timeline.Open()</code>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>2. Visibility &amp; Permissions</h3>
+    <ul>
+      <li><strong>Global Visibility:</strong> New timelines are <strong>Hidden</strong> by default. Click the <strong>Hiding</strong> / <strong>Showing</strong> (eye) button in the Manager's toolbar to make a timeline visible to players.</li>
+      <li><strong>User Permissions:</strong> The <strong>User Permissions</strong> button lets you show a timeline to specific players while keeping it hidden from others.</li>
+      <li><strong>Hidden Entries:</strong> Each entry has its own eye button, so you can hide individual entries within a visible timeline until you are ready to reveal them.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>3. Mystery Mode 🕵️‍♂️</h3>
+    <p>Want to show <em>that</em> an event happened without revealing <em>what</em> it is?</p>
+    <ul>
+      <li>Use the <strong>Mystery</strong> chip on an entry to open Mystery Mode.</li>
+      <li>You can selectively hide the <strong>Image</strong>, the <strong>Text</strong> (name, description &amp; tags), or the <strong>Timeframe</strong>.</li>
+      <li>Players will see a placeholder, letting them know something exists there without spoiling the surprise.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>4. Timeframe Modes &amp; Sorting</h3>
+    <ul>
+      <li>Each timeline has a <strong>Timeframe Mode</strong>, set in the timeline <strong>Settings</strong>: <strong>Free (Text)</strong>, <code>DD/MM/YYYY</code>, <code>MM/YYYY</code>, <code>DD/MM/YYYY HH:MM</code>, <code>HH:MM:SS</code>, or <code>HH:MM</code>.</li>
+      <li><strong>Auto Sort:</strong> If enabled in the timeline settings, entries reorder themselves chronologically whenever you edit their timeframe. The <strong>Sort</strong> button sorts the timeline once.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>5. Interactivity &amp; Media</h3>
+    <ul>
+      <li><strong>Linked Journals:</strong> Drag a Journal Entry or a Journal Page onto an entry's <strong>Drag a Page Here</strong> zone. A page icon appears on the event's card in the viewer, and players can click it to read the full lore behind that event.</li>
+      <li><strong>Images:</strong> Click an entry's <strong>Img</strong> chip to pick a picture. Then use the <strong>Focus</strong> chip to choose which part of the image the thumbnail shows.</li>
+      <li><strong>Visual Effects:</strong> Make important events pop with the <strong>Effect</strong> chip: <strong>Glow (Light)</strong>, <strong>Glow (Strong)</strong>, <strong>Float</strong>, <strong>Shake</strong>, <strong>Pulse</strong>, or <strong>Glitch</strong>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>6. Broadcasting</h3>
+    <ul>
+      <li>Want everyone to look at the timeline <em>right now</em>? Click the broadcast button (<em>Show this timeline to all connected players</em>) in the Manager. It makes the timeline visible if it was hidden and immediately opens the viewer on all connected players' screens.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>7. Tags</h3>
+    <ul>
+      <li>Use the <strong>Manage Tags</strong> button in the Manager's sidebar to create global tags (e.g., "War", "Personal Quest", "Politics").</li>
+      <li>Assign them to entries with the <strong>Tags</strong> chip, so players can filter the timeline to see only the plot threads they are interested in.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>8. Periods</h3>
+    <ul>
+      <li>A period is a named span of events, such as an age, a war or a reign. Open the <strong>Periods</strong> button in the Manager's toolbar to add one.</li>
+      <li>Each period has a name, a color, a <strong>From</strong> event and a <strong>To</strong> event. It follows those events when entries are reordered.</li>
+      <li>The window's <strong>Off</strong> / <strong>Lane</strong> choice sets whether the timeline draws its periods: as bars above the line in the viewer, and in the margin of the PDF export. Off hides them without deleting anything.</li>
+      <li>Up to three periods can overlap on the same events. A fourth is not drawn, and the Periods window says so.</li>
+      <li>A period that starts or ends on an event hidden from players is not shown to them.</li>
+    </ul>
+  </section>
+</div>

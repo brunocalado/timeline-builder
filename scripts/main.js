@@ -16,6 +16,7 @@ import { TimelineManager } from "./manager.js";
 import { TimelineViewer } from "./viewer.js";
 import { TimelineWelcome } from "./welcome.js";
 import { ImportExportForm } from "./forms/import-export-form.js";
+import { InstructionsForm } from "./forms/instructions-form.js";
 
 // Singleton instances
 let managerInstance = null;
@@ -135,6 +136,17 @@ Hooks.once("init", () => {
     default: ""
   });
 
+  // Register the Instructions menu button in Foundry's Configure Settings, listed first.
+  // GM-only: the text is about the Manager, permissions and hidden entries.
+  game.settings.registerMenu(MODULE_ID, "instructionsMenu", {
+    name: "Instructions",
+    label: "Instructions",
+    hint: "How to create, show and manage timelines.",
+    icon: "fa-solid fa-book-open",
+    type: InstructionsForm,
+    restricted: true
+  });
+
   // Register the Import/Export menu button in Foundry's Configure Settings.
   // GM-only, same as the other data-modifying tools (PDF export, tag/color managers).
   game.settings.registerMenu(MODULE_ID, "importExportMenu", {
@@ -153,7 +165,8 @@ Hooks.once("init", () => {
     TEMPLATES.ENTRY,
     TEMPLATES.WELCOME,
     TEMPLATES.IMPORT_EXPORT,
-    TEMPLATES.PERIODS
+    TEMPLATES.PERIODS,
+    TEMPLATES.INSTRUCTIONS
   ]);
 
   // Register Handlebars partials

@@ -48,6 +48,9 @@
     },
     {
       "src": "styles/timeline-periods.css"
+    },
+    {
+      "src": "styles/timeline-instructions.css"
     }
   ],
   "packs": [
