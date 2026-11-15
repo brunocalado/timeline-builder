@@ -26,6 +26,8 @@ export class TimelineViewer extends BaseHandlebarsForm {
   #activeFilters = new Set();
   /** Active text filter (timeframe) */
   #textFilter = "";
+  /** Re-lays out the period bars when the scroll area changes size (e.g. restored from minimized) */
+  #periodObserver = null;
 
   constructor(options) {
     super(options);
@@ -75,6 +77,7 @@ export class TimelineViewer extends BaseHandlebarsForm {
       }
     }
     Hooks.off("updateSetting", this._settingHook);
+    this.#periodObserver?.disconnect();
     return super.close(options);
   }
 
@@ -205,6 +208,12 @@ export class TimelineViewer extends BaseHandlebarsForm {
       if (img) entry.classList.add("has-image");
     });
     this.#layoutPeriods();
+    // A render while the window is minimized (the GM edits the timeline) lays the bars out with
+    // every offset at 0, and restoring the window triggers no render. The scroll container changes
+    // size when it is laid out again; it, not the track, so has-periods' padding can't re-trigger it.
+    this.#periodObserver?.disconnect();
+    this.#periodObserver = new ResizeObserver(() => this.#layoutPeriods());
+    this.#periodObserver.observe(container);
 
     // Setup Live Text Filter
     const searchInput = this.element.querySelector('.filter-search-input');
@@ -339,22 +348,28 @@ export class TimelineViewer extends BaseHandlebarsForm {
   /**
    * Position each period bar over the entries it covers that are currently shown. Not pure CSS:
    * `.filtered-out` is `display: none`, which takes entries out of the flow and moves every later one.
-   * A filtered-out anchor clamps the bar to the nearest shown member; no member shown hides it.
+   * A filtered-out anchor clamps the bar to the nearest shown member; no member shown hides it, and
+   * with every bar hidden the strip gives its height back (`has-periods` off).
+   * Reads layout, so it must run again once the track is laid out: see #periodObserver.
    */
   #layoutPeriods() {
-    const track = this.element.querySelector(".timeline-track.has-periods");
-    if (!track) return;
+    const track = this.element.querySelector(".timeline-track");
+    const items = track?.querySelectorAll(".period-item") ?? [];
+    if (!items.length) return;
     const byId = new Map([...track.querySelectorAll(".h-entry")].map((el) => [el.dataset.entryId, el]));
-    for (const item of track.querySelectorAll(".period-item")) {
+    let anyShown = false;
+    for (const item of items) {
       const shown = item.dataset.entryIds.split(",").map((id) => byId.get(id))
         .filter((el) => el && !el.classList.contains("filtered-out"));
       item.hidden = shown.length === 0;
       if (!shown.length) continue;
+      anyShown = true;
       const first = shown[0], last = shown.at(-1);
       // offsetLeft is relative to the track (position: relative), the entries' offset parent.
       item.style.left = `${first.offsetLeft}px`;
       item.style.width = `${last.offsetLeft + last.offsetWidth - first.offsetLeft}px`;
     }
+    track.classList.toggle("has-periods", anyShown);
   }
 
   /**
