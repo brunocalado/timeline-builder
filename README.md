@@ -21,7 +21,7 @@
 
 ## 🚀 Getting Started
 
-1.  **Access**: Go to the **Notes Layer** (left toolbar) and click the **Timeline** (clock) icon.
+1.  **Access**: Go to the **Notes Layer** (left toolbar) and click the **Timeline** (clock) icon. As GM, you can read the full instructions in **Configure Settings**, on the **Timeline Builder** tab, with the **Instructions** button.
 
 <p align="center"><img width="600" src="docs/howtoopen.webp"></p>
 
