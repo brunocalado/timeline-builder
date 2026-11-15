@@ -7,6 +7,7 @@
 - [Removed] The Macros compendium. Open the timeline from the Timeline button in the Notes controls, or call `Timeline.Open()` and `Timeline.Manage()` from a macro of your own.
 - [Added] An Instructions button in Configure Settings opens the module's instructions, now including periods.
 - [Removed] The Instructions compendium. Its text is now the Instructions window in Configure Settings.
+- [Changed] Each version is now published as a GitHub release, with the module files at the root of its `module.zip`. The manifest URL is now `https://github.com/brunocalado/timeline-builder/releases/latest/download/module.json`; installs from the old URL still update, since the `module.json` on `main` points to the new one.
 
 # 0.1.3
 

@@ -47,7 +47,7 @@ Timeline.Manage();
 Install via the Foundry VTT Module browser or use this manifest link:
 
 ```js
-https://raw.githubusercontent.com/brunocalado/timeline-builder/main/module.json
+https://github.com/brunocalado/timeline-builder/releases/latest/download/module.json
 ```
 
 ## ⚖️ Credits and License

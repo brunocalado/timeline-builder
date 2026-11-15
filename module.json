@@ -54,7 +54,7 @@
     }
   ],
   "url": "https://github.com/brunocalado/timeline-builder",
-  "manifest": "https://raw.githubusercontent.com/brunocalado/timeline-builder/main/module.json",
+  "manifest": "https://github.com/brunocalado/timeline-builder/releases/latest/download/module.json",
   "download": "https://codeload.github.com/brunocalado/timeline-builder/zip/main",
   "flags": {}
 }
