@@ -6,6 +6,7 @@
 - [Added] PDF export marks periods with colored bars in the margin and a caption at their first entry.
 - [Removed] The Macros compendium. Open the timeline from the Timeline button in the Notes controls, or call `Timeline.Open()` and `Timeline.Manage()` from a macro of your own.
 - [Added] An Instructions button in Configure Settings opens the module's instructions, now including periods.
+- [Removed] The Instructions compendium. Its text is now the Instructions window in Configure Settings.
 
 # 0.1.3
 

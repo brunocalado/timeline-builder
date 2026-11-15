@@ -3,6 +3,7 @@
  */
 import { MODULE_ID, TEMPLATES } from "./config.js";
 import { BaseHandlebarsForm } from "./forms/BaseHandlebarsForm.js";
+import { InstructionsForm } from "./forms/instructions-form.js";
 
 export class TimelineWelcome extends BaseHandlebarsForm {
   static DEFAULT_OPTIONS = {
@@ -17,13 +18,6 @@ export class TimelineWelcome extends BaseHandlebarsForm {
     content: { template: TEMPLATES.WELCOME }
   };
 
-  async _prepareContext() {
-    return {
-      ...await super._prepareContext(),
-      journalUuid: "Compendium.timeline-builder.journal.JournalEntry.nmEPLrplwb6WaVdc"
-    };
-  }
-
   _onRender(context, options) {
     super._onRender(context, options);
 
@@ -36,11 +30,9 @@ export class TimelineWelcome extends BaseHandlebarsForm {
       this.close();
     });
 
-    // Action: Open Journal
-    html.querySelector('[data-action="openJournal"]')?.addEventListener("click", async (ev) => {
-      const uuid = ev.currentTarget.dataset.uuid;
-      const entry = await fromUuid(uuid);
-      if (entry?.sheet) entry.sheet.render(true);
+    // Action: Open Instructions
+    html.querySelector('[data-action="openInstructions"]')?.addEventListener("click", () => {
+      new InstructionsForm().render(true);
     });
   }
 }

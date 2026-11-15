@@ -1,7 +1,0 @@
-2026/05/30-18:15:36.424 96c Recovering log #402
-2026/05/30-18:15:36.427 96c Delete type=0 #402
-2026/05/30-18:15:36.427 96c Delete type=3 #401
-2026/05/30-18:17:50.820 3ec4 Level-0 table #406: started
-2026/05/30-18:17:50.821 3ec4 Level-0 table #406: 0 bytes OK
-2026/05/30-18:17:50.822 3ec4 Delete type=0 #404
-2026/05/30-18:17:50.828 3ec4 Manual compaction at level-0 from '!journal!nmEPLrplwb6WaVdc' @ 72057594037927935 : 1 .. '!journal.pages!nmEPLrplwb6WaVdc.jv3upaYcDplYSzm0' @ 0 : 0; will stop at (end)

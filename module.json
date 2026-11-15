@@ -53,31 +53,6 @@
       "src": "styles/timeline-instructions.css"
     }
   ],
-  "packs": [
-    {
-      "label": "Instructions",
-      "type": "JournalEntry",
-      "name": "journal",
-      "path": "packs/journal",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      },
-      "flags": {},
-      "banner": "modules/timeline-builder/assets/images/banner.webp"
-    }
-  ],
-  "packFolders": [
-    {
-      "name": "⏳ Timeline Builder",
-      "sorting": "a",
-      "color": "#3e0a66",
-      "packs": [
-        "journal"
-      ],
-      "folders": []
-    }
-  ],
   "url": "https://github.com/brunocalado/timeline-builder",
   "manifest": "https://raw.githubusercontent.com/brunocalado/timeline-builder/main/module.json",
   "download": "https://codeload.github.com/brunocalado/timeline-builder/zip/main",
