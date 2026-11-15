@@ -537,18 +537,19 @@ export class TimelineManager extends BaseHandlebarsForm {
       [field]: input.value
     });
 
-    // Live edits do not re-render the manager (focus would be lost), so the Periods window,
-    // whose anchor options are labelled "timeframe · name", is refreshed directly.
-    if ((field === "name" || field === "period") && this.#periodsForm?.rendered) {
-      this.#periodsForm.render();
-    }
-
     if (field === "period") {
       const timeline = TimelineStore.getTimeline(this.#selectedTimelineId);
       if (timeline?.autoSort) {
         await TimelineManager.#performSort(timeline);
-        this.render();
+        this.render(); // refreshes the Periods window too
+        return;
       }
+    }
+
+    // Live edits do not re-render the manager (focus would be lost), so the Periods window,
+    // whose anchor options are labelled "timeframe · name", is refreshed directly.
+    if ((field === "name" || field === "period") && this.#periodsForm?.rendered) {
+      this.#periodsForm.render();
     }
   }
 
