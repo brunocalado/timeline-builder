@@ -1,5 +1,6 @@
-# Unreleased
+# 0.2.0
 
+- https://github.com/brunocalado/timeline-builder/issues/8
 - [Added] Periods: group entries into named periods from the new Periods window in the Timeline Manager, with a per-timeline display setting (Off / Lane).
 - [Added] The Timeline Manager entry list shows colored rails for the periods an entry belongs to.
 - [Added] Viewer: periods drawn as bars in a lane above the timeline (Lane display).
