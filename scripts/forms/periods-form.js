@@ -13,14 +13,14 @@
  * and the manager re-renders this window in turn, so there is exactly one render per change.
  */
 
-import { TEMPLATES, MAX_PERIOD_LANES, MAX_PERIOD_NAME_LENGTH } from "../config.js";
+import { TEMPLATES, MAX_PERIOD_LANES, MAX_PERIOD_NAME_LENGTH, PERIOD_DISPLAY } from "../config.js";
 import { TimelineStore } from "../store.js";
-import { getPeriodDisplay, resolvePeriods } from "../periods.js";
+import { getPeriodDisplay, periodColor, resolvePeriods } from "../periods.js";
 import { BaseHandlebarsForm } from "./BaseHandlebarsForm.js";
 
 const DISPLAY_OPTIONS = [
-  { value: "none", label: "Off", icon: "fa-solid fa-eye-slash", hint: "Periods are hidden everywhere but this window. Nothing is deleted." },
-  { value: "lane", label: "Lane", icon: "fa-solid fa-bars-staggered", hint: "Bars in a lane above the timeline. Periods may overlap." }
+  { value: PERIOD_DISPLAY.NONE, label: "Off", icon: "fa-solid fa-eye-slash", hint: "Periods are hidden everywhere but this window. Nothing is deleted." },
+  { value: PERIOD_DISPLAY.LANE, label: "Lane", icon: "fa-solid fa-bars-staggered", hint: "Bars in a lane above the timeline. Periods may overlap." }
 ];
 
 export class PeriodsForm extends BaseHandlebarsForm {
@@ -87,7 +87,7 @@ export class PeriodsForm extends BaseHandlebarsForm {
           startEntryId: p.startEntryId,
           endEntryId: p.endEntryId,
           color,
-          swatch: color || timeline.defaultColor || "var(--tl-primary)",
+          swatch: periodColor(color, timeline),
           status: p.status,
           statusText: p.status === "incomplete" ? "Pick a start and an end entry."
             : p.status === "overflow" ? `Not shown: more than ${MAX_PERIOD_LANES} periods overlap here.` : "",

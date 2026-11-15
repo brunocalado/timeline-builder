@@ -43,6 +43,11 @@ export function getPeriodDisplay(timeline) {
     : DEFAULT_PERIOD_DISPLAY;
 }
 
+/** The color a period is drawn in: its own, else the timeline's default, else the theme's. */
+export function periodColor(color, timeline) {
+  return color || timeline.defaultColor || "var(--tl-primary)";
+}
+
 /**
  * "412 → 498" from the two anchor entries' timeframe text. A mystery timeframe reads "???"
  * (as on the card). Empty or identical ends collapse to a single value; both empty gives "".
@@ -82,7 +87,7 @@ export function resolvePeriods(timeline, entries, { separator = " → ", ignoreD
       lane: -1,
       entryIds: entries.slice(start, end + 1).map((e) => e.id),
       label: periodLabel(entries[start], entries[end], separator),
-      color: p.color || timeline.defaultColor || "var(--tl-primary)"
+      color: periodColor(p.color, timeline)
     };
   });
 
